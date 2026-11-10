@@ -7,5 +7,5 @@
 - Deterministic dependency bundles and bounded discovery/capability resolution.
 - Injectable feedback, MCP, refresh and agxai runtimes.
 - Optional LangChain/xstructured, PostgreSQL and OpenTelemetry integrations.
-- Contract suites, typed distribution, Python 3.12–3.15 CI and trusted publishing.
+- Contract suites, typed distribution, Python 3.12–3.15 CI.
 - Zensical documentation, executable examples and portable Agent Skills.

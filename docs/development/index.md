@@ -24,9 +24,9 @@ untested paths.
 ## Publishing
 
 1. Connect the repository to Read the Docs as `skill-manager`; use `.readthedocs.yaml`.
-2. Configure the PyPI trusted publisher for repository `smuniharish/skill-manager`,
-   workflow `release.yml`, environment `pypi`.
-3. Verify CI, docs and wheel checks, then publish GitHub release `v1.0.0`.
+2. Verify CI, docs and wheel checks.
+3. Build and check the distributions with `uv build` and
+   `uvx twine check --strict dist/*`, then upload them with `uv publish`.
 4. Confirm the PyPI page, documentation and dynamic badges after publication.
 
 No API tokens belong in the repository. Remote publication status is separate
