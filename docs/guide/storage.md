@@ -23,7 +23,7 @@ malformed replacements retain the last valid revision.
 
 ## PostgreSQL
 
-Install `skill-manager[postgres]`. Pass an open psycopg `AsyncConnectionPool` to
+Install `agskillmanager[postgres]`. Pass an open psycopg `AsyncConnectionPool` to
 `PostgresSkillRegistry` and/or `PostgresSkillSource`; call `ensure_schema()` once.
 Tables use validated identifiers and bound parameters. Transactions and a partial
 unique index enforce one active revision per name/version across processes.

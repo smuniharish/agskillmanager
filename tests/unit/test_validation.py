@@ -93,7 +93,7 @@ def test_optional_import_names_the_extra(monkeypatch: pytest.MonkeyPatch) -> Non
         return real_import(name, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "__import__", blocked)
-    with pytest.raises(OptionalDependencyError, match=r"skill-manager\[extra\]"):
+    with pytest.raises(OptionalDependencyError, match=r"agskillmanager\[extra\]"):
         optional_import("missing_module_for_test", "extra")
 
 

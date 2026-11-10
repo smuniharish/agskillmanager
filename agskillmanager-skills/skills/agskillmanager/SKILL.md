@@ -1,18 +1,18 @@
 ---
-name: skill-manager
+name: agskillmanager
 description: >-
-  Use when integrating or debugging the skill-manager Python package: register
+  Use when integrating or debugging the agskillmanager Python package: register
   YAML Skills, discover instructions, compose dependency bundles, generate
   revisions, require human approval, reject and regenerate from feedback,
   resolve MCP capabilities, refresh catalogs, configure PostgreSQL or export
   OpenTelemetry and agxai decisions. Works with plain Python, LangGraph,
   LangChain, Agno, CrewAI and deepagents. For implementing a new source,
-  registry, generator, validator, embedder or sink use skill-manager-extend.
+  registry, generator, validator, embedder or sink use agskillmanager-extend.
 license: Apache-2.0
-compatibility: Python 3.12+ with skill-manager 1.x. Optional integrations require their extras.
+compatibility: Python 3.12+ with agskillmanager 1.x. Optional integrations require their extras.
 metadata:
   version: "1.0.0"
-  documentation: "https://skill-manager.readthedocs.io/en/latest/"
+  documentation: "https://agskillmanager.readthedocs.io/en/latest/"
 ---
 
 # Use Skill Manager

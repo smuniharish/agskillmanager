@@ -1,6 +1,6 @@
 """OpenTelemetry observability sink.
 
-Install with ``pip install 'skill-manager[otel]'``.
+Install with ``pip install 'agskillmanager[otel]'``.
 """
 
 from __future__ import annotations

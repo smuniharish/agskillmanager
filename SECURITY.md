@@ -3,7 +3,7 @@
 Security fixes target the current 1.x release.
 
 Report vulnerabilities privately through
-[GitHub security advisories](https://github.com/smuniharish/skill-manager/security/advisories/new).
+[GitHub security advisories](https://github.com/smuniharish/agskillmanager/security/advisories/new).
 Include affected versions, a minimal reproduction, impact and proposed mitigations.
 Do not post credentials or exploitable details in public issues.
 

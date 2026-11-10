@@ -6,7 +6,7 @@ uv run --no-sync python examples/quickstart.py
 uv run --no-sync pytest tests/examples -m "not live"
 ```
 
-Sources: [examples/](https://github.com/smuniharish/skill-manager/tree/master/examples).
+Sources: [examples/](https://github.com/smuniharish/agskillmanager/tree/master/examples).
 
 ## Offline workflows
 
@@ -41,8 +41,8 @@ Tests execute all four with scripted chat models; live tests run when a key is p
 Start local containers using Podman Desktop:
 
 ```console
-podman run -d --name skill-manager-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=skill_manager -p 127.0.0.1:55432:5432 postgres:18-alpine
-podman run -d --name skill-manager-lgtm -p 127.0.0.1:14318:4318 -p 127.0.0.1:13000:3000 -p 127.0.0.1:13200:3200 -p 127.0.0.1:19090:9090 grafana/otel-lgtm
+podman run -d --name agskillmanager-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=skill_manager -p 127.0.0.1:55432:5432 postgres:18-alpine
+podman run -d --name agskillmanager-lgtm -p 127.0.0.1:14318:4318 -p 127.0.0.1:13000:3000 -p 127.0.0.1:13200:3200 -p 127.0.0.1:19090:9090 grafana/otel-lgtm
 uv run --no-sync python examples/local_mcp_server.py
 ```
 

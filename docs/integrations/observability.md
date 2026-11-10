@@ -5,7 +5,7 @@ generation, review and bundle decisions.
 
 ## OpenTelemetry
 
-Install `skill-manager[otel]`. Inject `OpenTelemetrySkillObservabilitySink` with
+Install `agskillmanager[otel]`. Inject `OpenTelemetrySkillObservabilitySink` with
 explicit tracer/meter objects or providers. Otherwise global providers are used.
 Every event produces a zero-duration span and increments `skill_manager.events`
 with `event.name`.
@@ -15,7 +15,7 @@ Providers carry your sampling, resources, processors, readers and exporters.
 The manager never closes an injected sink.
 
 The [OTel example](../examples/index.md#service-backed-examples) exports to Grafana
-LGTM. Query Tempo for `service.name=skill-manager-example` and Prometheus for
+LGTM. Query Tempo for `service.name=agskillmanager-example` and Prometheus for
 `skill_manager_events_total`.
 
 ## agxai

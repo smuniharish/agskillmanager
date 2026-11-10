@@ -2,7 +2,7 @@
 
 from fastmcp import FastMCP
 
-server = FastMCP("skill-manager-local-tools")
+server = FastMCP("agskillmanager-local-tools")
 
 
 @server.tool(name="github.pull_request.read")

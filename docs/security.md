@@ -16,5 +16,5 @@ generation. The package does not authenticate reviewers.
 Frozen Pydantic models do not recursively freeze arbitrary dictionaries; treat
 nested mappings as read-only and use new validated revisions for content changes.
 
-Report privately through [GitHub security advisories](https://github.com/smuniharish/skill-manager/security/advisories/new).
-See [SECURITY.md](https://github.com/smuniharish/skill-manager/blob/master/SECURITY.md).
+Report privately through [GitHub security advisories](https://github.com/smuniharish/agskillmanager/security/advisories/new).
+See [SECURITY.md](https://github.com/smuniharish/agskillmanager/blob/master/SECURITY.md).

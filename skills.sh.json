@@ -1,4 +1,4 @@
 {
   "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
-  "paths": ["./skill-manager-skills/skills"]
+  "paths": ["./agskillmanager-skills/skills"]
 }

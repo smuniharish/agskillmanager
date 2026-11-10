@@ -15,7 +15,7 @@ system_prompt = "\n".join(bundle.instructions)
 - **deepagents:** pass the same prompt to `create_deep_agent`.
 
 Framework examples live in the `examples` dependency group. Install
-`skill-manager[langchain]` only for `XStructuredSkillGenerator` or `LangChainEmbedder`.
+`agskillmanager[langchain]` only for `XStructuredSkillGenerator` or `LangChainEmbedder`.
 Applications choose and own model clients.
 
 Generation wraps any runnable with xstructured, forwarding supplied options and

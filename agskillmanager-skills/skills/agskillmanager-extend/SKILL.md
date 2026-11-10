@@ -1,17 +1,17 @@
 ---
-name: skill-manager-extend
+name: agskillmanager-extend
 description: >-
-  Use when extending skill-manager with a custom SkillSource, SkillRegistry,
+  Use when extending agskillmanager with a custom SkillSource, SkillRegistry,
   SkillGenerator, SkillValidator, DiscoveryProvider, retriever, reranker,
   embedding provider or observability sink. Also use to debug failing
   SkillSourceContract or SkillRegistryContract tests and adapt database or
   framework-specific integrations. For ordinary registration, approval,
-  discovery or bundle usage use the skill-manager skill instead.
+  discovery or bundle usage use the agskillmanager skill instead.
 license: Apache-2.0
-compatibility: Python 3.12+ with skill-manager 1.x. Templates and contract runner work offline.
+compatibility: Python 3.12+ with agskillmanager 1.x. Templates and contract runner work offline.
 metadata:
   version: "1.0.0"
-  documentation: "https://skill-manager.readthedocs.io/en/latest/api/extensions/"
+  documentation: "https://agskillmanager.readthedocs.io/en/latest/api/extensions/"
 ---
 
 # Extend Skill Manager

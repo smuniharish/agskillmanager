@@ -20,6 +20,132 @@ resolution-markers = [
 overrides = [{ name = "tenacity", specifier = ">=9.2.1,<10" }]
 
 [[package]]
+name = "agskillmanager"
+version = "1.0.0"
+source = { editable = "." }
+dependencies = [
+    { name = "agxai" },
+    { name = "feedback-manager" },
+    { name = "mcp-capability-router" },
+    { name = "packaging" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+    { name = "refresh-engine" },
+]
+
+[package.optional-dependencies]
+all = [
+    { name = "langchain-core" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-sdk" },
+    { name = "psycopg", extra = ["binary", "pool"] },
+    { name = "xstructured" },
+]
+langchain = [
+    { name = "langchain-core" },
+    { name = "xstructured" },
+]
+otel = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-sdk" },
+]
+postgres = [
+    { name = "psycopg", extra = ["binary", "pool"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyrefly" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+    { name = "skills-ref" },
+    { name = "types-pyyaml" },
+]
+docs = [
+    { name = "griffe-pydantic" },
+    { name = "mkdocstrings-python" },
+    { name = "zensical" },
+]
+examples = [
+    { name = "deepagents" },
+    { name = "fastmcp" },
+    { name = "langchain" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "streamlit" },
+]
+lint = [
+    { name = "ruff" },
+]
+test = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "skills-ref" },
+]
+types = [
+    { name = "pyrefly" },
+    { name = "types-pyyaml" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "agskillmanager", extras = ["langchain", "otel", "postgres"], marker = "extra == 'all'" },
+    { name = "agxai", specifier = ">=1.0.2,<2" },
+    { name = "feedback-manager", specifier = ">=0.1.2,<0.2" },
+    { name = "langchain-core", marker = "extra == 'langchain'", specifier = ">=1.7.7,<2" },
+    { name = "mcp-capability-router", specifier = ">=1.0.0,<2" },
+    { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.45.2,<2" },
+    { name = "opentelemetry-sdk", marker = "extra == 'otel'", specifier = ">=1.45.2,<2" },
+    { name = "packaging", specifier = ">=26.3" },
+    { name = "psycopg", extras = ["binary", "pool"], marker = "extra == 'postgres'", specifier = ">=3.3.8,<4" },
+    { name = "pydantic", specifier = ">=2.14.3,<3" },
+    { name = "pyyaml", specifier = ">=6.0.3,<7" },
+    { name = "refresh-engine", specifier = ">=1.0.0,<2" },
+    { name = "xstructured", marker = "extra == 'langchain'", specifier = ">=1.0.0,<2" },
+]
+provides-extras = ["langchain", "otel", "postgres", "all"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyrefly", specifier = ">=1.4.1" },
+    { name = "pytest", specifier = ">=9.2.0" },
+    { name = "pytest-asyncio", specifier = ">=1.4.1.post1" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+    { name = "ruff", specifier = ">=0.17.4" },
+    { name = "skills-ref", specifier = ">=0.1.1,<1" },
+    { name = "types-pyyaml", specifier = ">=6.0.12.20261103" },
+]
+docs = [
+    { name = "griffe-pydantic", specifier = ">=1.3.2,<2" },
+    { name = "mkdocstrings-python", specifier = ">=2.0.10,<3" },
+    { name = "zensical", specifier = ">=0.1.0,<0.2" },
+]
+examples = [
+    { name = "deepagents", specifier = ">=0.7.35,<1" },
+    { name = "fastmcp", specifier = ">=4.1.7,<5" },
+    { name = "langchain", specifier = ">=1.4.9,<2" },
+    { name = "langchain-openai", specifier = ">=1.7.4,<2" },
+    { name = "langgraph", specifier = ">=1.2.20,<2" },
+    { name = "opentelemetry-exporter-otlp-proto-http", specifier = ">=1.45.2,<2" },
+    { name = "streamlit", specifier = ">=1.67.0,<2" },
+]
+lint = [{ name = "ruff", specifier = ">=0.17.4" }]
+test = [
+    { name = "pytest", specifier = ">=9.2.0" },
+    { name = "pytest-asyncio", specifier = ">=1.4.1.post1" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+    { name = "skills-ref", specifier = ">=0.1.1,<1" },
+]
+types = [
+    { name = "pyrefly", specifier = ">=1.4.1" },
+    { name = "types-pyyaml", specifier = ">=6.0.12.20261103" },
+]
+
+[[package]]
 name = "agxai"
 version = "1.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3153,132 +3279,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b9/ab/d8e407669ffe5014429baf780c2df47e001968a6e4c17f615e2e7b13a9ba/ruff-0.17.4-py3-none-win32.whl", hash = "sha256:3971a78cba76298b284c8321e6d40d93045ed348bec5c369d85099efc97fb7cf", size = 9931993, upload-time = "2026-11-05T18:52:11.169Z" },
     { url = "https://files.pythonhosted.org/packages/bd/15/42af8a72d8946e3c9efd2bbf6641e462b6832783b0d043d63ef5b280ba7f/ruff-0.17.4-py3-none-win_amd64.whl", hash = "sha256:67c5a894fc054cf41f75f7afa24815de5a74329d97634126c2a1015740ff4e8c", size = 10292922, upload-time = "2026-11-05T18:52:13.436Z" },
     { url = "https://files.pythonhosted.org/packages/68/9e/f1dbffcfb8ff25dadbc21f87a8b73c3848abe4abada9d4b08ccef8bec40c/ruff-0.17.4-py3-none-win_arm64.whl", hash = "sha256:181ae38a9a8fb94925bf7d0794327b48d7fd7f4b50cfd84c0e999cc09ef8d131", size = 9889396, upload-time = "2026-11-05T18:52:15.549Z" },
-]
-
-[[package]]
-name = "skill-manager"
-version = "1.0.0"
-source = { editable = "." }
-dependencies = [
-    { name = "agxai" },
-    { name = "feedback-manager" },
-    { name = "mcp-capability-router" },
-    { name = "packaging" },
-    { name = "pydantic" },
-    { name = "pyyaml" },
-    { name = "refresh-engine" },
-]
-
-[package.optional-dependencies]
-all = [
-    { name = "langchain-core" },
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-sdk" },
-    { name = "psycopg", extra = ["binary", "pool"] },
-    { name = "xstructured" },
-]
-langchain = [
-    { name = "langchain-core" },
-    { name = "xstructured" },
-]
-otel = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-sdk" },
-]
-postgres = [
-    { name = "psycopg", extra = ["binary", "pool"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pyrefly" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-    { name = "skills-ref" },
-    { name = "types-pyyaml" },
-]
-docs = [
-    { name = "griffe-pydantic" },
-    { name = "mkdocstrings-python" },
-    { name = "zensical" },
-]
-examples = [
-    { name = "deepagents" },
-    { name = "fastmcp" },
-    { name = "langchain" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "opentelemetry-exporter-otlp-proto-http" },
-    { name = "streamlit" },
-]
-lint = [
-    { name = "ruff" },
-]
-test = [
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-cov" },
-    { name = "skills-ref" },
-]
-types = [
-    { name = "pyrefly" },
-    { name = "types-pyyaml" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "agxai", specifier = ">=1.0.2,<2" },
-    { name = "feedback-manager", specifier = ">=0.1.2,<0.2" },
-    { name = "langchain-core", marker = "extra == 'langchain'", specifier = ">=1.7.7,<2" },
-    { name = "mcp-capability-router", specifier = ">=1.0.0,<2" },
-    { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.45.2,<2" },
-    { name = "opentelemetry-sdk", marker = "extra == 'otel'", specifier = ">=1.45.2,<2" },
-    { name = "packaging", specifier = ">=26.3" },
-    { name = "psycopg", extras = ["binary", "pool"], marker = "extra == 'postgres'", specifier = ">=3.3.8,<4" },
-    { name = "pydantic", specifier = ">=2.14.3,<3" },
-    { name = "pyyaml", specifier = ">=6.0.3,<7" },
-    { name = "refresh-engine", specifier = ">=1.0.0,<2" },
-    { name = "skill-manager", extras = ["langchain", "otel", "postgres"], marker = "extra == 'all'" },
-    { name = "xstructured", marker = "extra == 'langchain'", specifier = ">=1.0.0,<2" },
-]
-provides-extras = ["langchain", "otel", "postgres", "all"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pyrefly", specifier = ">=1.4.1" },
-    { name = "pytest", specifier = ">=9.2.0" },
-    { name = "pytest-asyncio", specifier = ">=1.4.1.post1" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
-    { name = "ruff", specifier = ">=0.17.4" },
-    { name = "skills-ref", specifier = ">=0.1.1,<1" },
-    { name = "types-pyyaml", specifier = ">=6.0.12.20261103" },
-]
-docs = [
-    { name = "griffe-pydantic", specifier = ">=1.3.2,<2" },
-    { name = "mkdocstrings-python", specifier = ">=2.0.10,<3" },
-    { name = "zensical", specifier = ">=0.1.0,<0.2" },
-]
-examples = [
-    { name = "deepagents", specifier = ">=0.7.35,<1" },
-    { name = "fastmcp", specifier = ">=4.1.7,<5" },
-    { name = "langchain", specifier = ">=1.4.9,<2" },
-    { name = "langchain-openai", specifier = ">=1.7.4,<2" },
-    { name = "langgraph", specifier = ">=1.2.20,<2" },
-    { name = "opentelemetry-exporter-otlp-proto-http", specifier = ">=1.45.2,<2" },
-    { name = "streamlit", specifier = ">=1.67.0,<2" },
-]
-lint = [{ name = "ruff", specifier = ">=0.17.4" }]
-test = [
-    { name = "pytest", specifier = ">=9.2.0" },
-    { name = "pytest-asyncio", specifier = ">=1.4.1.post1" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
-    { name = "skills-ref", specifier = ">=0.1.1,<1" },
-]
-types = [
-    { name = "pyrefly", specifier = ">=1.4.1" },
-    { name = "types-pyyaml", specifier = ">=6.0.12.20261103" },
 ]
 
 [[package]]

@@ -1,1 +1,1 @@
-"""Runnable integration examples for skill-manager."""
+"""Runnable integration examples for agskillmanager."""

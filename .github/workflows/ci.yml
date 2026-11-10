@@ -93,8 +93,8 @@ jobs:
           uv pip install --python "$RUNNER_TEMP/wheel" dist/*.whl
           "$RUNNER_TEMP/wheel/bin/python" -c "import importlib.util; import skill_manager; assert importlib.util.find_spec('langchain_core') is None; assert importlib.util.find_spec('langgraph') is None; assert skill_manager.__version__ == '1.0.0'"
           "$RUNNER_TEMP/wheel/bin/python" examples/custom_framework.py
-          "$RUNNER_TEMP/wheel/bin/python" skill-manager-skills/skills/skill-manager/scripts/verify_setup.py
-          "$RUNNER_TEMP/wheel/bin/python" skill-manager-skills/skills/skill-manager-extend/scripts/check_source.py source_template:MemorySkillSource --path skill-manager-skills/skills/skill-manager-extend/assets
+          "$RUNNER_TEMP/wheel/bin/python" agskillmanager-skills/skills/agskillmanager/scripts/verify_setup.py
+          "$RUNNER_TEMP/wheel/bin/python" agskillmanager-skills/skills/agskillmanager-extend/scripts/check_source.py source_template:MemorySkillSource --path agskillmanager-skills/skills/agskillmanager-extend/assets
 
   docs:
     name: Documentation

@@ -18,7 +18,7 @@ from skill_manager.otel import OpenTelemetrySkillObservabilitySink
 
 async def main() -> None:
     endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4318").rstrip("/")
-    resource = Resource.create({"service.name": "skill-manager-example"})
+    resource = Resource.create({"service.name": "agskillmanager-example"})
     traces = TracerProvider(resource=resource)
     traces.add_span_processor(
         SimpleSpanProcessor(OTLPSpanExporter(endpoint=f"{endpoint}/v1/traces"))
@@ -39,7 +39,7 @@ async def main() -> None:
             await manager.build_bundle(["summarize-ticket"])
     finally:
         await sink.aclose()
-    show("OTel export complete", {"endpoint": endpoint, "service": "skill-manager-example"})
+    show("OTel export complete", {"endpoint": endpoint, "service": "agskillmanager-example"})
 
 
 if __name__ == "__main__":

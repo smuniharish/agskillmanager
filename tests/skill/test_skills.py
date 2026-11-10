@@ -12,10 +12,10 @@ from skill_manager import SkillGenerationRequest, SkillSource
 from skill_manager.testing import SkillSourceContract
 
 ROOT = Path(__file__).resolve().parents[2]
-SKILLS = ROOT / "skill-manager-skills" / "skills"
+SKILLS = ROOT / "agskillmanager-skills" / "skills"
 
 
-@pytest.mark.parametrize("name", ["skill-manager", "skill-manager-extend"])
+@pytest.mark.parametrize("name", ["agskillmanager", "agskillmanager-extend"])
 def test_skill_frontmatter_and_links(name: str) -> None:
     directory = SKILLS / name
     assert validate(directory) == []
@@ -34,15 +34,15 @@ def test_setup_and_quickstart_scripts(
 ) -> None:
     monkeypatch.setattr("sys.argv", ["verify_setup.py"])
     runpy.run_path(
-        str(SKILLS / "skill-manager" / "scripts" / "verify_setup.py"), run_name="__main__"
+        str(SKILLS / "agskillmanager" / "scripts" / "verify_setup.py"), run_name="__main__"
     )
     assert '"ok": true' in capsys.readouterr().out
-    runpy.run_path(str(SKILLS / "skill-manager" / "assets" / "quickstart.py"), run_name="__main__")
+    runpy.run_path(str(SKILLS / "agskillmanager" / "assets" / "quickstart.py"), run_name="__main__")
     assert "Remove personal information." in capsys.readouterr().out
 
 
 def test_source_contract_runner(monkeypatch: pytest.MonkeyPatch) -> None:
-    directory = SKILLS / "skill-manager-extend"
+    directory = SKILLS / "agskillmanager-extend"
     monkeypatch.setattr(
         "sys.argv",
         [
@@ -59,7 +59,7 @@ def test_source_contract_runner(monkeypatch: pytest.MonkeyPatch) -> None:
 
 async def test_generator_template() -> None:
     namespace = runpy.run_path(
-        str(SKILLS / "skill-manager-extend" / "assets" / "generator_template.py")
+        str(SKILLS / "agskillmanager-extend" / "assets" / "generator_template.py")
     )
     skill = await namespace["SupportSkillGenerator"]().generate(
         SkillGenerationRequest(input="review")
@@ -70,6 +70,6 @@ async def test_generator_template() -> None:
 class TestSourceTemplate(SkillSourceContract):
     async def make_source(self) -> SkillSource:
         namespace = runpy.run_path(
-            str(SKILLS / "skill-manager-extend" / "assets" / "source_template.py")
+            str(SKILLS / "agskillmanager-extend" / "assets" / "source_template.py")
         )
         return namespace["MemorySkillSource"]()

@@ -1,6 +1,6 @@
-# skill-manager
+# AG Skill Manager
 
-<img src="assets/logo.svg" alt="skill-manager" width="72">
+<img src="assets/logo.svg" alt="AG Skill Manager" width="72">
 
 **Govern reusable instructions without choosing an agent framework.**
 

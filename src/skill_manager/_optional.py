@@ -14,5 +14,5 @@ def optional_import(module: str, extra: str) -> Any:
         return import_module(module)
     except ImportError as error:
         raise OptionalDependencyError(
-            f"this integration requires the {extra!r} extra: pip install 'skill-manager[{extra}]'"
+            f"this integration requires the {extra!r} extra: pip install 'agskillmanager[{extra}]'"
         ) from error

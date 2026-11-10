@@ -29,4 +29,4 @@ registries, downstream runtimes and sinks remain caller-owned. The manager close
 only its default feedback manager and the scheduler started by `schedule_refresh`.
 
 The package reads no environment variables. Examples use the variables listed in
-[.env.example](https://github.com/smuniharish/skill-manager/blob/master/.env.example).
+[.env.example](https://github.com/smuniharish/agskillmanager/blob/master/.env.example).

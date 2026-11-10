@@ -3,7 +3,7 @@ requires = ["uv_build>=0.13.7,<0.14"]
 build-backend = "uv_build"
 
 [project]
-name = "skill-manager"
+name = "agskillmanager"
 version = "1.0.0"
 description = "A governed, framework-agnostic, asyncio-first Skill lifecycle for AI agents."
 readme = "README.md"
@@ -63,14 +63,14 @@ otel = [
   "opentelemetry-sdk>=1.45.2,<2",
 ]
 postgres = ["psycopg[binary,pool]>=3.3.8,<4"]
-all = ["skill-manager[langchain,otel,postgres]"]
+all = ["agskillmanager[langchain,otel,postgres]"]
 
 [project.urls]
-Homepage = "https://github.com/smuniharish/skill-manager"
-Documentation = "https://skill-manager.readthedocs.io/"
-Changelog = "https://github.com/smuniharish/skill-manager/blob/master/CHANGELOG.md"
-Issues = "https://github.com/smuniharish/skill-manager/issues"
-Repository = "https://github.com/smuniharish/skill-manager"
+Homepage = "https://github.com/smuniharish/agskillmanager"
+Documentation = "https://agskillmanager.readthedocs.io/"
+Changelog = "https://github.com/smuniharish/agskillmanager/blob/master/CHANGELOG.md"
+Issues = "https://github.com/smuniharish/agskillmanager/issues"
+Repository = "https://github.com/smuniharish/agskillmanager"
 
 [dependency-groups]
 test = [
@@ -103,6 +103,9 @@ examples = [
   "opentelemetry-exporter-otlp-proto-http>=1.45.2,<2",
   "streamlit>=1.67.0,<2",
 ]
+
+[tool.uv.build-backend]
+module-name = "skill_manager"
 
 [tool.uv]
 default-groups = ["dev"]
@@ -177,9 +180,9 @@ runtime-evaluated-base-classes = ["pydantic.BaseModel", "skill_manager.models.Fr
 "benchmarks/**/*.py" = ["ARG", "D", "T201"]
 "tests/**/*.py" = ["A002", "ARG", "D", "S101", "S105", "S106", "S108"]
 "tests/sources/*.py" = ["ASYNC240"]
-"skill-manager-skills/**/scripts/*.py" = ["ARG", "D", "T201"]
-"skill-manager-skills/**/assets/*.py" = ["ARG", "D", "T201"]
-"skill-manager-skills/**/evals/files/**/*.py" = ["ARG", "D", "T201"]
+"agskillmanager-skills/**/scripts/*.py" = ["ARG", "D", "T201"]
+"agskillmanager-skills/**/assets/*.py" = ["ARG", "D", "T201"]
+"agskillmanager-skills/**/evals/files/**/*.py" = ["ARG", "D", "T201"]
 # Generators receive the caller's input under the conventional runnable name.
 "src/skill_manager/api.py" = ["A002"]
 
@@ -187,8 +190,8 @@ runtime-evaluated-base-classes = ["pydantic.BaseModel", "skill_manager.models.Fr
 docstring-code-format = true
 
 [tool.pyrefly]
-project-includes = ["src", "tests", "examples", "scripts", "benchmarks", "skill-manager-skills"]
-search-path = ["src", ".", "examples", "skill-manager-skills/skills/skill-manager-extend/assets"]
+project-includes = ["src", "tests", "examples", "scripts", "benchmarks", "agskillmanager-skills"]
+search-path = ["src", ".", "examples", "agskillmanager-skills/skills/agskillmanager-extend/assets"]
 
 [tool.coverage.run]
 branch = true

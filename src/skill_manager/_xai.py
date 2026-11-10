@@ -27,7 +27,7 @@ async def record_decision(
     run = runtime.current_run
     owned = run is None
     if run is None:
-        run = await runtime.start_run({"component": "skill-manager", "operation": action})
+        run = await runtime.start_run({"component": "agskillmanager", "operation": action})
     error: BaseException | None = None
     try:
         evidence = await runtime.record_evidence(

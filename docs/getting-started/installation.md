@@ -3,10 +3,10 @@
 Python 3.12 through 3.15 are tested.
 
 ```console
-pip install skill-manager
-pip install "skill-manager[langchain]"
-pip install "skill-manager[postgres,otel]"
-pip install "skill-manager[all]"
+pip install agskillmanager
+pip install "agskillmanager[langchain]"
+pip install "agskillmanager[postgres,otel]"
+pip install "agskillmanager[all]"
 ```
 
 | Extra | Included |
@@ -20,8 +20,8 @@ Model providers, agent frameworks and telemetry exporters are application choice
 The repository's `examples` group installs the libraries used by its examples.
 
 ```console
-git clone https://github.com/smuniharish/skill-manager.git
-cd skill-manager
+git clone https://github.com/smuniharish/agskillmanager.git
+cd agskillmanager
 uv sync --locked --all-extras --all-groups
 uv run --no-sync python examples/quickstart.py
 ```

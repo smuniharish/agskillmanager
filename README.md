@@ -1,18 +1,18 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/smuniharish/skill-manager/master/docs/assets/logo.svg" width="80" alt="skill-manager">
+  <img src="https://raw.githubusercontent.com/smuniharish/agskillmanager/master/docs/assets/logo.svg" width="80" alt="AG Skill Manager">
 </p>
 
-# skill-manager
+# agskillmanager
 
 **Governed, framework-agnostic Skill lifecycle management for AI agents.**
 
-[![CI](https://github.com/smuniharish/skill-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/smuniharish/skill-manager/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/skill-manager)](https://pypi.org/project/skill-manager/)
-[![Documentation](https://readthedocs.org/projects/skill-manager/badge/?version=latest)](https://skill-manager.readthedocs.io/en/latest/)
-[![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14%20%7C%203.15-blue)](https://github.com/smuniharish/skill-manager/blob/master/pyproject.toml)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/smuniharish/skill-manager/actions/workflows/ci.yml)
-[![Typed](https://img.shields.io/badge/typing-typed-blue)](https://github.com/smuniharish/skill-manager/blob/master/src/skill_manager/py.typed)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/smuniharish/skill-manager/blob/master/LICENSE)
+[![CI](https://github.com/smuniharish/agskillmanager/actions/workflows/ci.yml/badge.svg)](https://github.com/smuniharish/agskillmanager/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/agskillmanager)](https://pypi.org/project/agskillmanager/)
+[![Documentation](https://readthedocs.org/projects/agskillmanager/badge/?version=latest)](https://agskillmanager.readthedocs.io/en/latest/)
+[![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14%20%7C%203.15-blue)](https://github.com/smuniharish/agskillmanager/blob/master/pyproject.toml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/smuniharish/agskillmanager/actions/workflows/ci.yml)
+[![Typed](https://img.shields.io/badge/typing-typed-blue)](https://github.com/smuniharish/agskillmanager/blob/master/src/skill_manager/py.typed)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/smuniharish/agskillmanager/blob/master/LICENSE)
 
 Reusable instructions become application assets: validated, discoverable, versioned,
 reviewable and ready to compose. Skill Manager produces a typed `SkillBundle`;
@@ -35,10 +35,10 @@ your agent framework owns execution.
 Python 3.12 through 3.15.
 
 ```console
-pip install skill-manager
-pip install "skill-manager[langchain]"     # xstructured generation and embeddings
-pip install "skill-manager[postgres,otel]" # PostgreSQL and OpenTelemetry
-pip install "skill-manager[all]"
+pip install agskillmanager
+pip install "agskillmanager[langchain]"     # xstructured generation and embeddings
+pip install "agskillmanager[postgres,otel]" # PostgreSQL and OpenTelemetry
+pip install "agskillmanager[all]"
 ```
 
 ## Quickstart
@@ -88,18 +88,18 @@ instructions. Restart-safe review needs durable registry and feedback storage.
 | xstructured | `XStructuredSkillGenerator(...)` | Runnable, repair and structured-output options |
 
 Caller-created collaborators remain caller-owned. See the full
-[customization matrix](https://skill-manager.readthedocs.io/en/latest/integrations/customization/).
+[customization matrix](https://agskillmanager.readthedocs.io/en/latest/integrations/customization/).
 
 ## Explore
 
-- [Documentation](https://skill-manager.readthedocs.io/en/latest/)
-- [Runnable examples](https://github.com/smuniharish/skill-manager/tree/master/examples):
+- [Documentation](https://agskillmanager.readthedocs.io/en/latest/)
+- [Runnable examples](https://github.com/smuniharish/agskillmanager/tree/master/examples):
   plain Python, LangGraph, LangChain, deepagents, approval, PostgreSQL, MCP and OTel.
-- [API reference](https://skill-manager.readthedocs.io/en/latest/api/manager/)
-- [Agent Skills](https://github.com/smuniharish/skill-manager/tree/master/skill-manager-skills)
-- [Contributing](https://github.com/smuniharish/skill-manager/blob/master/CONTRIBUTING.md)
-- [Security](https://github.com/smuniharish/skill-manager/blob/master/SECURITY.md)
-- [Changelog](https://github.com/smuniharish/skill-manager/blob/master/CHANGELOG.md)
+- [API reference](https://agskillmanager.readthedocs.io/en/latest/api/manager/)
+- [Agent Skills](https://github.com/smuniharish/agskillmanager/tree/master/agskillmanager-skills)
+- [Contributing](https://github.com/smuniharish/agskillmanager/blob/master/CONTRIBUTING.md)
+- [Security](https://github.com/smuniharish/agskillmanager/blob/master/SECURITY.md)
+- [Changelog](https://github.com/smuniharish/agskillmanager/blob/master/CHANGELOG.md)
 
 ## Development
 
@@ -117,4 +117,4 @@ CI measures 100% line and branch coverage with a PostgreSQL service, checks Pyth
 Service/model examples are live-tested when their documented environment variables
 are set. Never commit credentials.
 
-Licensed under [Apache-2.0](https://github.com/smuniharish/skill-manager/blob/master/LICENSE).
+Licensed under [Apache-2.0](https://github.com/smuniharish/agskillmanager/blob/master/LICENSE).

@@ -1,6 +1,6 @@
 """PostgreSQL Skill source and registry.
 
-Install with ``pip install 'skill-manager[postgres]'``. Both classes take a
+Install with ``pip install 'agskillmanager[postgres]'``. Both classes take a
 psycopg ``AsyncConnectionPool``; the caller opens it, and the class closes it in
 ``aclose`` only when constructed with ``owns_pool=True``. Call `ensure_schema`
 once to create the table and indexes. On Windows, run psycopg's async API on a

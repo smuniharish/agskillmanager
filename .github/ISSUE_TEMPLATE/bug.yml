@@ -12,6 +12,6 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Python, skill-manager, dependency versions, OS and enabled extras.
+      description: Python, agskillmanager, dependency versions, OS and enabled extras.
     validations:
       required: true

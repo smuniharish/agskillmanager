@@ -1,6 +1,6 @@
 """LangChain integration: xstructured Skill generation and embeddings.
 
-Install with ``pip install 'skill-manager[langchain]'``.
+Install with ``pip install 'agskillmanager[langchain]'``.
 """
 
 from __future__ import annotations

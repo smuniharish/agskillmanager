@@ -44,4 +44,4 @@ Configure learning artifact/vector/graph storage through feedback-manager's
 learning engine, then inject that manager. For external scheduling call `refresh`
 from your chosen scheduler. No downstream configuration is reconstructed.
 
-See the runnable [customization matrix](https://github.com/smuniharish/skill-manager/blob/master/examples/customization_matrix.py).
+See the runnable [customization matrix](https://github.com/smuniharish/agskillmanager/blob/master/examples/customization_matrix.py).

@@ -1,8 +1,8 @@
 # Development and release
 
-See [CONTRIBUTING](https://github.com/smuniharish/skill-manager/blob/master/CONTRIBUTING.md),
-[CHANGELOG](https://github.com/smuniharish/skill-manager/blob/master/CHANGELOG.md) and
-[code of conduct](https://github.com/smuniharish/skill-manager/blob/master/CODE_OF_CONDUCT.md).
+See [CONTRIBUTING](https://github.com/smuniharish/agskillmanager/blob/master/CONTRIBUTING.md),
+[CHANGELOG](https://github.com/smuniharish/agskillmanager/blob/master/CHANGELOG.md) and
+[code of conduct](https://github.com/smuniharish/agskillmanager/blob/master/CODE_OF_CONDUCT.md).
 
 ```console
 uv sync --locked --all-extras --all-groups
@@ -23,7 +23,7 @@ untested paths.
 
 ## Publishing
 
-1. Connect the repository to Read the Docs as `skill-manager`; use `.readthedocs.yaml`.
+1. Connect the repository to Read the Docs as `agskillmanager`; use `.readthedocs.yaml`.
 2. Verify CI, docs and wheel checks.
 3. Build and check the distributions with `uv build` and
    `uvx twine check --strict dist/*`, then upload them with `uv publish`.

@@ -6,5 +6,5 @@ information are not acceptable.
 
 Maintainers may moderate content, close discussions or restrict participation
 to protect the community. Report concerns privately through the repository's
-[security contact](https://github.com/smuniharish/skill-manager/security/advisories/new),
+[security contact](https://github.com/smuniharish/agskillmanager/security/advisories/new),
 including enough context for a fair review.

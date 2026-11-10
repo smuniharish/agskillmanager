@@ -1,12 +1,12 @@
 [project]
-site_name = "skill-manager"
+site_name = "AG Skill Manager"
 site_description = "Governed, framework-agnostic Skill lifecycle management for AI agents."
-site_url = "https://skill-manager.readthedocs.io/en/latest/"
+site_url = "https://agskillmanager.readthedocs.io/en/latest/"
 site_author = "smuniharish"
-repo_name = "smuniharish/skill-manager"
-repo_url = "https://github.com/smuniharish/skill-manager"
+repo_name = "smuniharish/agskillmanager"
+repo_url = "https://github.com/smuniharish/agskillmanager"
 edit_uri = "edit/master/docs/"
-copyright = "Copyright &copy; skill-manager contributors. Apache License 2.0."
+copyright = "Copyright &copy; AG Skill Manager contributors. Apache License 2.0."
 extra_css = ["stylesheets/extra.css"]
 nav = [
   { "Home" = "index.md" },
@@ -82,13 +82,13 @@ toggle.name = "Switch to light mode"
 
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
-link = "https://github.com/smuniharish/skill-manager"
-name = "skill-manager on GitHub"
+link = "https://github.com/smuniharish/agskillmanager"
+name = "AG Skill Manager on GitHub"
 
 [[project.extra.social]]
 icon = "fontawesome/brands/python"
-link = "https://pypi.org/project/skill-manager/"
-name = "skill-manager on PyPI"
+link = "https://pypi.org/project/agskillmanager/"
+name = "AG Skill Manager on PyPI"
 
 [project.plugins.mkdocstrings.handlers.python]
 paths = ["src"]

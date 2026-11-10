@@ -72,7 +72,7 @@ from skill_manager.validation import (
     parse_skill_yaml,
 )
 
-__version__ = version("skill-manager")
+__version__ = version("agskillmanager")
 
 __all__ = [
     "CapabilityResolutionError",
