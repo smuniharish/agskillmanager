@@ -1,4 +1,8 @@
-"""Skill Manager domain exceptions."""
+"""Skill Manager exception hierarchy.
+
+Every expected failure derives from `SkillManagerError`, so callers can catch
+one base class or a precise subclass.
+"""
 
 from __future__ import annotations
 
@@ -7,12 +11,16 @@ class SkillManagerError(Exception):
     """Base class for expected Skill Manager failures."""
 
 
+class OptionalDependencyError(SkillManagerError, ImportError):
+    """An integration needs an extra that is not installed."""
+
+
 class SkillValidationError(SkillManagerError):
     """A Skill document or domain value is invalid."""
 
 
 class SkillNotFoundError(SkillManagerError):
-    """No Skill matches the requested immutable ID or name/version."""
+    """No Skill matches the requested immutable ID or name and version."""
 
 
 class SkillSourceError(SkillManagerError):
@@ -28,7 +36,11 @@ class SkillDependencyError(SkillManagerError):
 
 
 class SkillDependencyCycleError(SkillDependencyError):
-    """The dependency graph contains a cycle."""
+    """The dependency graph contains a cycle.
+
+    Attributes:
+        path: Skill names along the cycle, starting and ending with the same name.
+    """
 
     def __init__(self, path: tuple[str, ...]) -> None:
         self.path = path
@@ -44,11 +56,15 @@ class CapabilityResolutionError(SkillManagerError):
 
 
 class SkillCreationDisabledError(SkillManagerError):
-    """Agent Skill creation is disabled by hard policy."""
+    """Agent Skill creation is disabled by policy."""
+
+
+class SkillGenerationError(SkillManagerError):
+    """A `SkillGenerator` could not produce a valid Skill."""
 
 
 class SkillGovernanceError(SkillManagerError):
-    """A governance policy does not permit a requested operation."""
+    """A governance policy does not permit the requested operation."""
 
 
 class SkillApprovalError(SkillManagerError):

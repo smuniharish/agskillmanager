@@ -1,0 +1,15 @@
+{
+  "skill_name": "skill-manager-extend",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement a custom YAML source for our object store.",
+      "expected_output": "Async SkillSource subclass, stable locators, idempotent save/delete, passing contracts."
+    },
+    {
+      "id": 2,
+      "prompt": "Add semantic retrieval with our embedding client.",
+      "expected_output": "Downstream Embedder ABC with matching vector dimensions; no framework dependency in core."
+    }
+  ]
+}

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from packaging.specifiers import SpecifierSet
-from packaging.version import InvalidVersion, Version
+from packaging.version import Version
 
 from skill_manager.errors import (
     SkillConflictError,
@@ -14,6 +14,9 @@ from skill_manager.errors import (
     SkillDependencyError,
 )
 from skill_manager.models import Skill, SkillDependency, SkillLifecycleState
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 @dataclass(frozen=True)
@@ -24,7 +27,21 @@ class _Requirement:
 
 
 def resolve_dependencies(roots: Iterable[Skill], catalog: Iterable[Skill]) -> tuple[Skill, ...]:
-    """Return a deterministic dependency-first resolution satisfying shared constraints."""
+    """Resolve the transitive dependencies of ``roots`` against the active ``catalog``.
+
+    The search prefers the highest matching version of each dependency and
+    backtracks when a later constraint rules it out. One revision is chosen per
+    Skill name, shared by every Skill that depends on it.
+
+    Returns:
+        The selected Skills in dependency-first order, ties broken by name,
+        version and Skill ID, so equal inputs always produce equal output.
+
+    Raises:
+        SkillDependencyError: If a dependency has no matching active revision.
+        SkillDependencyCycleError: If the selected Skills form a cycle.
+        SkillConflictError: If two roots share a name or constraints conflict.
+    """
     available = tuple(
         skill for skill in catalog if skill.lifecycle.state is SkillLifecycleState.ACTIVE
     )
@@ -45,22 +62,16 @@ def resolve_dependencies(roots: Iterable[Skill], catalog: Iterable[Skill]) -> tu
 
     def matching(dependency: SkillDependency) -> list[Skill]:
         spec = SpecifierSet("" if dependency.version == "*" else dependency.version)
-        try:
-            matches = [
-                skill
-                for skill in available
-                if skill.metadata.name == dependency.name
-                and Version(skill.metadata.version) in spec
-            ]
-            return sorted(
-                matches,
-                key=lambda item: (Version(item.metadata.version), item.skill_id),
-                reverse=True,
-            )
-        except InvalidVersion as error:
-            raise SkillDependencyError(
-                f"invalid semantic version while resolving {dependency.name!r}"
-            ) from error
+        matches = [
+            skill
+            for skill in available
+            if skill.metadata.name == dependency.name and Version(skill.metadata.version) in spec
+        ]
+        return sorted(
+            matches,
+            key=lambda item: (Version(item.metadata.version), item.skill_id),
+            reverse=True,
+        )
 
     def enqueue_children(
         skill: Skill,
@@ -120,7 +131,6 @@ def resolve_dependencies(roots: Iterable[Skill], catalog: Iterable[Skill]) -> tu
         pending: tuple[_Requirement, ...],
         chosen: dict[str, Skill],
         edges: dict[str, set[str]],
-        expanded: frozenset[str],
     ) -> tuple[Skill, ...]:
         if not pending:
             return topological_order(chosen, edges)
@@ -145,17 +155,7 @@ def resolve_dependencies(roots: Iterable[Skill], catalog: Iterable[Skill]) -> tu
                 )
             next_edges = {key: set(value) for key, value in edges.items()}
             next_edges.setdefault(requirement.parent.skill_id, set()).add(selected.skill_id)
-            next_pending = remaining
-            next_expanded = expanded
-            if selected.skill_id not in expanded:
-                next_pending = (
-                    *enqueue_children(
-                        selected, (*requirement.path, requirement.parent.metadata.name)
-                    ),
-                    *remaining,
-                )
-                next_expanded = expanded | {selected.skill_id}
-            return search(next_pending, chosen, next_edges, next_expanded)
+            return search(remaining, chosen, next_edges)
 
         failures: list[SkillDependencyError | SkillConflictError] = []
         for candidate in options:
@@ -163,19 +163,15 @@ def resolve_dependencies(roots: Iterable[Skill], catalog: Iterable[Skill]) -> tu
             next_chosen[dependency.name] = candidate
             next_edges = {key: set(value) for key, value in edges.items()}
             next_edges.setdefault(requirement.parent.skill_id, set()).add(candidate.skill_id)
-            next_pending = remaining
-            next_expanded = expanded
-            if candidate.skill_id not in expanded:
-                next_pending = (
-                    *enqueue_children(
-                        candidate,
-                        (*requirement.path, requirement.parent.metadata.name),
-                    ),
-                    *remaining,
-                )
-                next_expanded = expanded | {candidate.skill_id}
+            next_pending = (
+                *enqueue_children(
+                    candidate,
+                    (*requirement.path, requirement.parent.metadata.name),
+                ),
+                *remaining,
+            )
             try:
-                return search(next_pending, next_chosen, next_edges, next_expanded)
+                return search(next_pending, next_chosen, next_edges)
             except (SkillDependencyError, SkillConflictError) as error:
                 failures.append(error)
         raise failures[0]
@@ -184,12 +180,8 @@ def resolve_dependencies(roots: Iterable[Skill], catalog: Iterable[Skill]) -> tu
         requirement for root in sorted_roots for requirement in enqueue_children(root, ())
     )
     initial_edges = {root.skill_id: set() for root in sorted_roots}
-    try:
-        return search(
-            pending,
-            assignments,
-            initial_edges,
-            frozenset(root.skill_id for root in sorted_roots),
-        )
-    except (SkillDependencyError, SkillConflictError):
-        raise
+    return search(
+        pending,
+        assignments,
+        initial_edges,
+    )

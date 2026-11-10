@@ -1,0 +1,13 @@
+name: Feature request
+description: Propose an improvement.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Use case and desired outcome
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach and alternatives

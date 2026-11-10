@@ -1,0 +1,20 @@
+{
+  "skill_name": "skill-manager",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add governed support-ticket instructions to a plain Python agent without LangChain.",
+      "expected_output": "Async SkillManager registration, discovery and bundle handoff; no framework import."
+    },
+    {
+      "id": 2,
+      "prompt": "Generate a skill, reject it with feedback, regenerate and require human approval.",
+      "expected_output": "SkillGenerator instance, approval enabled, parent_skill_id lineage, explicit approval."
+    },
+    {
+      "id": 3,
+      "prompt": "Use my existing feedback store and MCP authentication without losing their options.",
+      "expected_output": "Inject fully built collaborators unchanged and preserve caller ownership."
+    }
+  ]
+}

@@ -1,112 +1,204 @@
 [build-system]
-requires = ["hatchling>=1.27"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.13.7,<0.14"]
+build-backend = "uv_build"
 
 [project]
 name = "skill-manager"
-version = "0.1.0"
-description = "Async-first Skill lifecycle management for LangChain and LangGraph applications"
+version = "1.0.0"
+description = "A governed, framework-agnostic, asyncio-first Skill lifecycle for AI agents."
 readme = "README.md"
+requires-python = ">=3.12"
 license = "Apache-2.0"
-requires-python = ">=3.12,<3.13"
-authors = [{ name = "S MUNI HARISH" }]
-keywords = ["skills", "langchain", "langgraph", "agents", "yaml"]
+license-files = ["LICENSE"]
+authors = [
+  { name = "S MUNI HARISH", email = "samamuniharish@gmail.com" },
+]
+keywords = [
+  "agents",
+  "agent-skills",
+  "skills",
+  "governance",
+  "approval",
+  "provenance",
+  "langchain",
+  "langgraph",
+  "agno",
+  "crewai",
+  "mcp",
+  "yaml",
+]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Framework :: AsyncIO",
+  "Framework :: Pydantic :: 2",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
   "Typing :: Typed",
 ]
 dependencies = [
-  "contextsage>=0.1.0,<0.2",
-  "feedback-manager>=0.1.0,<0.2",
-  "langchain>=1.4.2,<2",
-  "langgraph>=1.2.12,<1.3",
-  "langgraph-xai>=0.1.0,<0.2",
-  "mcp-capability-router>=0.1.0,<0.2",
-  "packaging>=24.0",
-  "pydantic>=2.12,<3",
-  "PyYAML>=6.0.2,<7",
-  "refresh-engine>=0.1.0,<0.2",
-  "xstructured>=0.1.0,<0.2",
+  "agxai>=1.0.2,<2",
+  "feedback-manager>=0.1.2,<0.2",
+  "mcp-capability-router>=1.0.0,<2",
+  "packaging>=26.3",
+  "pydantic>=2.14.3,<3",
+  "pyyaml>=6.0.3,<7",
+  "refresh-engine>=1.0.0,<2",
 ]
 
 [project.optional-dependencies]
-deepagents = ["deepagents>=0.7.19,<0.8"]
-mcp = ["langchain-mcp-adapters>=0.1.0"]
-openai-compatible = ["langchain-openai>=0.3,<2"]
-observability = [
-    "opentelemetry-exporter-otlp-proto-http>=1.30,<2",
-    "opentelemetry-sdk>=1.30,<2",
+langchain = [
+  "langchain-core>=1.7.7,<2",
+  "xstructured>=1.0.0,<2",
 ]
-ollama-embeddings = ["langchain-ollama>=0.3,<2"]
-postgres = [
-    "asyncpg>=0.30,<1",
+otel = [
+  "opentelemetry-api>=1.45.2,<2",
+  "opentelemetry-sdk>=1.45.2,<2",
 ]
-ui = ["streamlit>=1.45,<2"]
+postgres = ["psycopg[binary,pool]>=3.3.8,<4"]
+all = ["skill-manager[langchain,otel,postgres]"]
+
+[project.urls]
+Homepage = "https://github.com/smuniharish/skill-manager"
+Documentation = "https://skill-manager.readthedocs.io/"
+Changelog = "https://github.com/smuniharish/skill-manager/blob/master/CHANGELOG.md"
+Issues = "https://github.com/smuniharish/skill-manager/issues"
+Repository = "https://github.com/smuniharish/skill-manager"
 
 [dependency-groups]
+test = [
+  "pytest>=9.2.0",
+  "pytest-asyncio>=1.4.1.post1",
+  "pytest-cov>=7.1.0",
+  "skills-ref>=0.1.1,<1",
+]
+lint = ["ruff>=0.17.4"]
+types = [
+  "pyrefly>=1.4.1",
+  "types-pyyaml>=6.0.12.20261103",
+]
+docs = [
+  "griffe-pydantic>=1.3.2,<2",
+  "mkdocstrings-python>=2.0.10,<3",
+  "zensical>=0.1.0,<0.2",
+]
 dev = [
-  "black>=25.1",
-  "build>=1.2",
-  "coverage[toml]>=7.6",
-  "mkdocs>=1.6",
-  "mkdocs-material>=9.5",
-  "mkdocstrings[python]>=0.26",
-  "numpy>=2.0",
-  "pyrefly>=0.18",
-  "pytest>=8.3",
-  "pytest-asyncio>=0.24",
-  "ruff>=0.6",
-  "twine>=6.0",
+  { include-group = "test" },
+  { include-group = "lint" },
+  { include-group = "types" },
+]
+examples = [
+  "deepagents>=0.7.35,<1",
+  "fastmcp>=4.1.7,<5",
+  "langchain>=1.4.9,<2",
+  "langchain-openai>=1.7.4,<2",
+  "langgraph>=1.2.20,<2",
+  "opentelemetry-exporter-otlp-proto-http>=1.45.2,<2",
+  "streamlit>=1.67.0,<2",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/skill_manager"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-  "/src",
-  "/tests",
-  "/docs",
-  "/examples",
-  "/skill-manager-skills",
-  "/benchmarks",
-  "/README.md",
-  "/LICENSE",
-  "/mkdocs.yml",
-  "/pyproject.toml",
-]
+[tool.uv]
+default-groups = ["dev"]
+# google-genai, pulled in by the deepagents example, caps tenacity below the 9.2 line that
+# refresh-engine requires. The override only applies to this project's development lock.
+override-dependencies = ["tenacity>=9.2.1,<10"]
 
 [tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
+filterwarnings = [
+  "error",
+  # langsmith calls asyncio.iscoroutinefunction at import time (deprecated in 3.14).
+  "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:langsmith",
+  # key_value's runtime-checkability probe emits this on Python 3.15.
+  "ignore:.*key_value.*isn't explicitly decorated with @runtime_checkable:DeprecationWarning",
+]
+markers = [
+  "live: tests requiring explicitly configured external services",
+  "postgres: tests requiring SKILL_MANAGER_TEST_POSTGRES_DSN",
+  "benchmark: performance regression tests",
+  "examples: tests that execute the scripts under examples/",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "ARG",
+  "ASYNC",
+  "B",
+  "C4",
+  "D",
+  "DTZ",
+  "E",
+  "ERA",
+  "F",
+  "I",
+  "N",
+  "PERF",
+  "PIE",
+  "PT",
+  "PTH",
+  "RUF",
+  "S",
+  "SIM",
+  "T20",
+  "TC",
+  "UP",
+  "W",
+]
+# Google style documents constructor arguments on the class, not on __init__.
+ignore = ["D105", "D107", "S101"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-type-checking]
+# Pydantic resolves field annotations at runtime.
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "skill_manager.models.FrozenModel"]
+
+[tool.ruff.lint.per-file-ignores]
+# Docstring and unused-argument rules apply to the package; examples, scripts, and
+# tests implement framework callbacks and fakes whose signatures are fixed.
+"examples/**/*.py" = ["ARG", "D", "S311", "T201"]
+"scripts/**/*.py" = ["ARG", "D", "T201"]
+"benchmarks/**/*.py" = ["ARG", "D", "T201"]
+"tests/**/*.py" = ["A002", "ARG", "D", "S101", "S105", "S106", "S108"]
+"tests/sources/*.py" = ["ASYNC240"]
+"skill-manager-skills/**/scripts/*.py" = ["ARG", "D", "T201"]
+"skill-manager-skills/**/assets/*.py" = ["ARG", "D", "T201"]
+"skill-manager-skills/**/evals/files/**/*.py" = ["ARG", "D", "T201"]
+# Generators receive the caller's input under the conventional runnable name.
+"src/skill_manager/api.py" = ["A002"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.pyrefly]
+project-includes = ["src", "tests", "examples", "scripts", "benchmarks", "skill-manager-skills"]
+search-path = ["src", ".", "examples", "skill-manager-skills/skills/skill-manager-extend/assets"]
 
 [tool.coverage.run]
 branch = true
 source = ["skill_manager"]
 
 [tool.coverage.report]
-fail_under = 80
+fail_under = 100
 show_missing = true
 skip_covered = true
-
-[tool.ruff]
-line-length = 100
-target-version = "py312"
-extend-exclude = [".venv312", ".venv-smoke", "site", "dist", "build"]
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "ASYNC", "S"]
-ignore = ["S101"]
-
-[tool.black]
-line-length = 100
-target-version = ["py312"]
-
-[tool.pyrefly]
-project-includes = ["src", "tests"]
-python-version = "3.12"
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "^\\s*\\.\\.\\.$",
+]
