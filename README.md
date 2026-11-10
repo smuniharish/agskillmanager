@@ -9,10 +9,10 @@
 [![CI](https://github.com/smuniharish/skill-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/smuniharish/skill-manager/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/skill-manager)](https://pypi.org/project/skill-manager/)
 [![Documentation](https://readthedocs.org/projects/skill-manager/badge/?version=latest)](https://skill-manager.readthedocs.io/en/latest/)
-[![Python](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fsmuniharish%2Fskill-manager%2Fmaster%2Fpyproject.toml)](https://github.com/smuniharish/skill-manager/blob/master/pyproject.toml)
+[![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14%20%7C%203.15-blue)](https://github.com/smuniharish/skill-manager/blob/master/pyproject.toml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/smuniharish/skill-manager/actions/workflows/ci.yml)
 [![Typed](https://img.shields.io/badge/typing-typed-blue)](https://github.com/smuniharish/skill-manager/blob/master/src/skill_manager/py.typed)
-[![License](https://img.shields.io/github/license/smuniharish/skill-manager)](https://github.com/smuniharish/skill-manager/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/smuniharish/skill-manager/blob/master/LICENSE)
 
 Reusable instructions become application assets: validated, discoverable, versioned,
 reviewable and ready to compose. Skill Manager produces a typed `SkillBundle`;
