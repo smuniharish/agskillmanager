@@ -9,9 +9,9 @@ description: >-
   LangChain, Agno, CrewAI and deepagents. For implementing a new source,
   registry, generator, validator, embedder or sink use agskillmanager-extend.
 license: Apache-2.0
-compatibility: Python 3.12+ with agskillmanager 1.x. Optional integrations require their extras.
+compatibility: Python 3.12-3.14 with agskillmanager 2.x. Optional integrations require their extras.
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   documentation: "https://agskillmanager.readthedocs.io/en/latest/"
 ---
 
