@@ -15,8 +15,8 @@ Sources: [examples/](https://github.com/smuniharish/agskillmanager/tree/master/e
 | `quickstart.py` | Registration, discovery and dependency bundles |
 | `filesystem_source.py` | Multiple sources and reload |
 | `approval_workflow.py` | Rejection, regeneration, approval and lineage |
-| `semantic_discovery.py` | Custom async embedder and reranker |
-| `langchain_embeddings.py` | LangChain adapter with local embeddings |
+| `semantic_discovery.py` | Custom RetrievalLoom embedding model and reranker |
+| `langchain_embeddings.py` | `LangChainEmbeddingModel` with local embeddings |
 | `custom_framework.py` | Framework-free prompt handoff |
 | `refresh.py` | External resource refresh and scheduling |
 | `xai_decisions.py` | Collect and explain decisions |
@@ -35,6 +35,28 @@ uses memory and approved YAML uses the configured directory.
 `OPENAI_BASE_URL` and `OPENAI_MODEL` select any OpenAI-compatible endpoint.
 Never commit a populated `.env`; export settings into the shell before running.
 Tests execute all four with scripted chat models; live tests run when a key is present.
+
+## Local-model discovery
+
+`local_models_discovery.py` adds dense search with bge-m3, reranking with
+bge-reranker-v2-m3 and claim checking with an NLI model (default
+`deberta-base-long-nli`; set `NLI_MODEL` to another folder under `models/nli/`).
+Weights are read from `MODELS_DIR` (default `models/`, which is gitignored) and are
+never downloaded:
+
+```text
+models/
+  bge-m3/
+  bge-reranker-v2-m3/
+  nli/deberta-base-long-nli/
+```
+
+```console
+uv sync --group models
+uv run --no-sync python examples/local_models_discovery.py
+```
+
+The live example test skips when the models or the `models` group are missing.
 
 ## Service-backed examples
 

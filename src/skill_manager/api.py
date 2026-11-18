@@ -42,7 +42,7 @@ from refresh_engine import (
 
 from skill_manager._xai import record_decision
 from skill_manager.config import SkillManagerConfig
-from skill_manager.discovery import DiscoveryProvider, PipelineDiscoveryProvider
+from skill_manager.discovery import DiscoveryProvider, RetrievalLoomDiscoveryProvider
 from skill_manager.errors import (
     CapabilityResolutionError,
     SkillApprovalError,
@@ -129,7 +129,8 @@ class SkillManager:
     Args:
         sources: Skill sources; the first is the default write target.
         registry: Catalog; defaults to `InMemorySkillRegistry`.
-        discovery: Discovery provider; defaults to lexical `PipelineDiscoveryProvider`.
+        discovery: Discovery provider; defaults to an in-memory
+            `RetrievalLoomDiscoveryProvider` that the manager owns and closes.
         validator: Policy validator; defaults to `DefaultSkillValidator`.
         config: Policy switches and limits.
         feedback_manager: Records approvals and rejections; defaults to an
@@ -164,7 +165,8 @@ class SkillManager:
         if len(self._source_by_id) != len(self._sources):
             raise ValueError("Skill source IDs must be unique")
         self._registry = registry if registry is not None else InMemorySkillRegistry()
-        self._discovery = discovery if discovery is not None else PipelineDiscoveryProvider()
+        self._owns_discovery = discovery is None
+        self._discovery = discovery if discovery is not None else RetrievalLoomDiscoveryProvider()
         self._validator = validator if validator is not None else DefaultSkillValidator()
         self._owns_feedback = feedback_manager is None
         self._feedback = feedback_manager if feedback_manager is not None else FeedbackManager()
@@ -597,7 +599,7 @@ class SkillManager:
             return scheduler
 
     async def aclose(self) -> None:
-        """Stop the owned scheduler and close the owned feedback manager.
+        """Stop the owned scheduler and close the owned feedback manager and discovery provider.
 
         Injected collaborators stay open; their owner closes them.
         """
@@ -607,6 +609,8 @@ class SkillManager:
                 self._scheduler = None
         if self._owns_feedback:
             await self._feedback.aclose()
+        if self._owns_discovery:
+            await self._discovery.aclose()
 
     async def _decide(
         self,

@@ -9,7 +9,7 @@
 [![CI](https://github.com/smuniharish/agskillmanager/actions/workflows/ci.yml/badge.svg)](https://github.com/smuniharish/agskillmanager/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agskillmanager)](https://pypi.org/project/agskillmanager/)
 [![Documentation](https://readthedocs.org/projects/agskillmanager/badge/?version=latest)](https://agskillmanager.readthedocs.io/en/latest/)
-[![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14%20%7C%203.15-blue)](https://github.com/smuniharish/agskillmanager/blob/master/pyproject.toml)
+[![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-blue)](https://github.com/smuniharish/agskillmanager/blob/master/pyproject.toml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/smuniharish/agskillmanager/actions/workflows/ci.yml)
 [![Typed](https://img.shields.io/badge/typing-typed-blue)](https://github.com/smuniharish/agskillmanager/blob/master/src/skill_manager/py.typed)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/smuniharish/agskillmanager/blob/master/LICENSE)
@@ -23,6 +23,9 @@ your agent framework owns execution.
 - Canonical YAML and typed, validated domain models.
 - Immutable revision identity, dependency resolution and provenance lineage.
 - Async ABC extension points for storage, discovery, generation and telemetry.
+- Hybrid keyword, fuzzy and BM25 Skill discovery powered by
+  [RetrievalLoom](https://pypi.org/project/retrievalloom/), with pluggable
+  embeddings, rerankers and NLI.
 - Human approval, rejection and feedback-informed regeneration.
 - MCP capability resolution, refresh scheduling and bounded caches.
 - Fully configured downstream runtimes stay injectable, including their stores,
@@ -32,7 +35,7 @@ your agent framework owns execution.
 
 ## Install
 
-Python 3.12 through 3.15.
+Python 3.12 through 3.14.
 
 ```console
 pip install agskillmanager
@@ -85,6 +88,7 @@ instructions. Restart-safe review needs durable registry and feedback storage.
 | mcp-capability-router | `mcp_runtime=` | Registry, retrieval, transport, auth, resilience |
 | refresh-engine | `refresh_engine=` | Source, operation, fingerprint, storage and events |
 | agxai | `xai_runtime=` | Provenance, disclosure, explanation and plugins |
+| retrievalloom | `discovery=RetrievalLoomDiscoveryProvider(...)` | Embeddings, reranker, NLI, indexes, stores and retrieval config |
 | xstructured | `XStructuredSkillGenerator(...)` | Runnable, repair and structured-output options |
 
 Caller-created collaborators remain caller-owned. See the full
@@ -113,7 +117,7 @@ uv run --no-sync zensical build --strict
 ```
 
 CI measures 100% line and branch coverage with a PostgreSQL service, checks Python
-3.12–3.15, validates docs and verifies a core wheel without optional frameworks.
+3.12–3.14, validates docs and verifies a core wheel without optional frameworks.
 Service/model examples are live-tested when their documented environment variables
 are set. Never commit credentials.
 

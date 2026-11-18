@@ -10,6 +10,8 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from pydantic import Field, model_validator
+from retrievalloom.contracts.component import ComponentInfo, make_info
+from retrievalloom.contracts.models import EmbeddingModelABC
 
 from skill_manager._optional import optional_import
 from skill_manager.errors import SkillGenerationError
@@ -24,12 +26,64 @@ from skill_manager.models import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from langchain_core.embeddings import Embeddings
     from langchain_core.runnables import Runnable
 
 _xstructured = optional_import("xstructured", "langchain")
-LangChainEmbedder = optional_import(
-    "mcp_capability_router.integrations.langchain", "langchain"
-).LangChainEmbedder
+
+
+class LangChainEmbeddingModel(EmbeddingModelABC):
+    """Adapt any LangChain ``Embeddings`` to a RetrievalLoom embedding model.
+
+    Pass it as ``Components(embedding=...)`` to `RetrievalLoomDiscoveryProvider`
+    to add dense semantic search to Skill discovery. The adapter calls the
+    asynchronous ``aembed_documents`` and ``aembed_query`` methods.
+
+    Args:
+        embeddings: The LangChain embeddings implementation.
+        dimensions: Length of every vector the embeddings return.
+        model_identity: Stable model name; changing it makes RetrievalLoom
+            build a new vector index. Defaults to the embeddings class name.
+    """
+
+    def __init__(
+        self,
+        embeddings: Embeddings,
+        *,
+        dimensions: int,
+        model_identity: str | None = None,
+    ) -> None:
+        if dimensions < 1:
+            raise ValueError("dimensions must be at least 1")
+        self._embeddings = embeddings
+        self._dimensions = dimensions
+        self._info = make_info(
+            component="embedding",
+            implementation="langchain",
+            version="1",
+            model_identity=model_identity or type(embeddings).__name__,
+            dimensions=dimensions,
+        )
+
+    @property
+    def info(self) -> ComponentInfo:
+        """Return the component identity RetrievalLoom fingerprints."""
+        return self._info
+
+    @property
+    def dimensions(self) -> int:
+        """Return the vector length."""
+        return self._dimensions
+
+    async def embed_documents(self, texts: Sequence[str]) -> Sequence[Sequence[float]]:
+        """Embed Skill documents."""
+        return await self._embeddings.aembed_documents(list(texts))
+
+    async def embed_query(self, text: str) -> Sequence[float]:
+        """Embed a discovery query."""
+        return await self._embeddings.aembed_query(text)
 
 
 def _feedback_payload(request: SkillGenerationRequest) -> list[dict[str, Any]]:
@@ -127,4 +181,4 @@ class XStructuredSkillGenerator(SkillGenerator):
         )
 
 
-__all__ = ["LangChainEmbedder", "XStructuredSkillGenerator"]
+__all__ = ["LangChainEmbeddingModel", "XStructuredSkillGenerator"]

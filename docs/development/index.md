@@ -17,7 +17,7 @@ uvx twine check --strict dist/*
 ```
 
 Full coverage requires `SKILL_MANAGER_TEST_POSTGRES_DSN` pointing at a disposable
-PostgreSQL database. CI tests Python 3.12–3.15, lowest direct dependencies and a
+PostgreSQL database. CI tests Python 3.12–3.14, lowest direct dependencies and a
 core wheel without LangChain/LangGraph. Never weaken the coverage target to hide
 untested paths.
 

@@ -14,7 +14,7 @@ from skill_manager import (
     DefaultSkillValidator,
     FilesystemSkillSource,
     InMemorySkillRegistry,
-    PipelineDiscoveryProvider,
+    RetrievalLoomDiscoveryProvider,
     SkillManager,
     SkillManagerConfig,
     SkillObservabilityEvent,
@@ -36,12 +36,13 @@ async def main() -> None:
     refresh = RefreshEngine(CatalogResources(), apply_refresh, store=InMemoryStateStore())
     xai = XAIRuntime(application_id="skill-customization", tenant_id="example")
     events = EventRecorder()
+    discovery = RetrievalLoomDiscoveryProvider(candidate_pool_size=25)
     try:
         with TemporaryDirectory() as root:
             async with SkillManager(
                 sources=[FilesystemSkillSource(root)],
                 registry=InMemorySkillRegistry(),
-                discovery=PipelineDiscoveryProvider(candidate_pool_size=25),
+                discovery=discovery,
                 validator=DefaultSkillValidator(),
                 config=SkillManagerConfig(require_human_approval=True),
                 feedback_manager=feedback,
@@ -56,6 +57,7 @@ async def main() -> None:
                 await manager.refresh()
                 show("Injected collaborators", {"events": events.names})
     finally:
+        await discovery.aclose()
         await feedback.aclose()
         await mcp.close()
         await refresh.close()

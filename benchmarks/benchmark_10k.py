@@ -7,7 +7,7 @@ import json
 import time
 import tracemalloc
 
-from skill_manager import PipelineDiscoveryProvider, Skill, SkillMetadata
+from skill_manager import RetrievalLoomDiscoveryProvider, Skill, SkillMetadata
 
 
 async def main() -> None:
@@ -25,16 +25,19 @@ async def main() -> None:
         for index in range(10_000)
     )
     construction = time.perf_counter() - start
-    discovery = PipelineDiscoveryProvider()
-    start = time.perf_counter()
-    await discovery.index(skills)
-    index = time.perf_counter() - start
-    start = time.perf_counter()
-    matches = await discovery.discover("support tasks", top_k=10)
-    query = time.perf_counter() - start
-    start = time.perf_counter()
-    await asyncio.gather(*(discovery.discover("support tasks") for _ in range(100)))
-    concurrent = time.perf_counter() - start
+    discovery = RetrievalLoomDiscoveryProvider()
+    try:
+        start = time.perf_counter()
+        await discovery.index(skills)
+        index = time.perf_counter() - start
+        start = time.perf_counter()
+        matches = await discovery.discover("support tasks", top_k=10)
+        query = time.perf_counter() - start
+        start = time.perf_counter()
+        await asyncio.gather(*(discovery.discover("support tasks") for _ in range(100)))
+        concurrent = time.perf_counter() - start
+    finally:
+        await discovery.aclose()
     current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     print(

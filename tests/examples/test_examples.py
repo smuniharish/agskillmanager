@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import os
 import runpy
 import subprocess
@@ -122,12 +123,31 @@ def test_live_service(name: str, settings: tuple[str, str]) -> None:
     assert expected in result.stdout
 
 
+@pytest.mark.live
+def test_live_local_models() -> None:
+    if not importlib.util.find_spec("sentence_transformers"):
+        pytest.skip("install the models dependency group")
+    local_models = importlib.import_module("examples._local_models")
+    if not local_models.models_available():
+        pytest.skip("place the local models under MODELS_DIR")
+    result = subprocess.run(  # noqa: S603 - fixed repository example path
+        [sys.executable, str(EXAMPLES / "local_models_discovery.py")],
+        capture_output=True,
+        text=True,
+        timeout=600,
+        check=True,
+    )
+    for text in ("refund-card-payment", "reset-password", '"contradicts_claim": true'):
+        assert text in result.stdout
+
+
 def test_streamlit_catalog(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     from streamlit.testing.v1 import AppTest
 
     monkeypatch.setenv("SKILL_MANAGER_UI_SKILLS_DIR", str(tmp_path))
     monkeypatch.syspath_prepend(str(EXAMPLES))
-    app = AppTest.from_file(str(EXAMPLES / "streamlit_catalog.py")).run()
+    # The first run imports and initializes the RetrievalLoom engine.
+    app = AppTest.from_file(str(EXAMPLES / "streamlit_catalog.py"), default_timeout=60).run()
     assert not app.exception
     assert app.metric[0].value == "0"
     app.text_input(key="register-name").set_value("manual-review")
@@ -156,4 +176,5 @@ def test_every_example_has_coverage() -> None:
     assert scripts == set(OFFLINE) | set(LLM) | set(SERVICES) | {
         "streamlit_catalog.py",
         "local_mcp_server.py",
+        "local_models_discovery.py",
     }

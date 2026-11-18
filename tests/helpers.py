@@ -8,9 +8,10 @@ from mcp_capability_router import (
     Capability,
     CapabilityFilter,
     CapabilityType,
-    Embedder,
     MCPRuntime,
 )
+from retrievalloom.contracts.component import ComponentInfo, make_info
+from retrievalloom.contracts.models import EmbeddingModelABC
 
 from skill_manager import (
     Skill,
@@ -135,15 +136,30 @@ class StaticGenerator(SkillGenerator):
         return self.skill
 
 
-class KeywordEmbedder(Embedder):
+class KeywordEmbeddingModel(EmbeddingModelABC):
     """Embed text as counts of a fixed vocabulary, so similarity is predictable."""
 
     def __init__(self, vocabulary: Sequence[str] = ("ticket", "invoice", "deploy")) -> None:
         self.vocabulary = tuple(vocabulary)
+        self._info = make_info(
+            component="embedding",
+            implementation="keyword-test",
+            version="1",
+            model_identity="keyword-" + "-".join(self.vocabulary),
+            dimensions=len(self.vocabulary),
+        )
+
+    @property
+    def info(self) -> ComponentInfo:
+        return self._info
+
+    @property
+    def dimensions(self) -> int:
+        return len(self.vocabulary)
 
     def _vector(self, text: str) -> list[float]:
         lowered = text.lower()
-        return [float(lowered.count(word)) for word in self.vocabulary]
+        return [float(lowered.count(word)) + 0.01 for word in self.vocabulary]
 
     async def embed_documents(self, texts: Sequence[str]) -> list[list[float]]:
         return [self._vector(text) for text in texts]

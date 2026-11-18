@@ -2,15 +2,15 @@
 name: agskillmanager-extend
 description: >-
   Use when extending agskillmanager with a custom SkillSource, SkillRegistry,
-  SkillGenerator, SkillValidator, DiscoveryProvider, retriever, reranker,
-  embedding provider or observability sink. Also use to debug failing
+  SkillGenerator, SkillValidator, DiscoveryProvider, RetrievalLoom embedding
+  model, reranker or NLI component, or observability sink. Also use to debug failing
   SkillSourceContract or SkillRegistryContract tests and adapt database or
   framework-specific integrations. For ordinary registration, approval,
   discovery or bundle usage use the agskillmanager skill instead.
 license: Apache-2.0
-compatibility: Python 3.12+ with agskillmanager 1.x. Templates and contract runner work offline.
+compatibility: Python 3.12-3.14 with agskillmanager 2.x. Templates and contract runner work offline.
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   documentation: "https://agskillmanager.readthedocs.io/en/latest/api/extensions/"
 ---
 
@@ -46,5 +46,6 @@ Use existing async ABC seams. Never introduce a second lifecycle or storage faca
 - [Contract runner](./scripts/check_source.py)
 - [Evaluation tasks](./evals/evals.json)
 
-Semantic embeddings use `mcp_capability_router.Embedder`; implement its two async
-methods instead of adding another abstraction. All package extension points are ABCs.
+Discovery runs on `RetrievalLoomDiscoveryProvider`. For semantic search, reranking or
+NLI implement RetrievalLoom's `EmbeddingModelABC`, `RerankerABC` or `NLIABC` and pass
+them as `Components`; do not add another abstraction. All package extension points are ABCs.

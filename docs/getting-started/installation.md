@@ -1,6 +1,6 @@
 # Installation
 
-Python 3.12 through 3.15 are tested.
+Python 3.12 through 3.14 are tested.
 
 ```console
 pip install agskillmanager

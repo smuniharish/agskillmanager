@@ -10,14 +10,9 @@ from importlib.metadata import version
 from skill_manager.api import SkillManager
 from skill_manager.config import SkillManagerConfig
 from skill_manager.discovery import (
+    DEFAULT_SCOPE,
     DiscoveryProvider,
-    LexicalSkillRetriever,
-    PipelineDiscoveryProvider,
-    RetrievedSkill,
-    ScoreSkillReranker,
-    SemanticSkillRetriever,
-    SkillReranker,
-    SkillRetriever,
+    RetrievalLoomDiscoveryProvider,
     matches_filters,
     skill_document,
     validate_filters,
@@ -75,18 +70,15 @@ from skill_manager.validation import (
 __version__ = version("agskillmanager")
 
 __all__ = [
+    "DEFAULT_SCOPE",
     "CapabilityResolutionError",
     "DefaultSkillValidator",
     "DiscoveryProvider",
     "FilesystemSkillSource",
     "InMemorySkillRegistry",
-    "LexicalSkillRetriever",
     "NoOpSkillObservabilitySink",
     "OptionalDependencyError",
-    "PipelineDiscoveryProvider",
-    "RetrievedSkill",
-    "ScoreSkillReranker",
-    "SemanticSkillRetriever",
+    "RetrievalLoomDiscoveryProvider",
     "Skill",
     "SkillApprovalError",
     "SkillBundle",
@@ -120,8 +112,6 @@ __all__ = [
     "SkillReference",
     "SkillRegistry",
     "SkillRejectionError",
-    "SkillReranker",
-    "SkillRetriever",
     "SkillSource",
     "SkillSourceError",
     "SkillValidationError",

@@ -9,8 +9,10 @@ replacement and state-filtered listing. Apply SkillRegistryContract to each back
 
 Generators return Skill data and accept SkillGenerationRequest, including parent
 and rejection history. Validators return a Skill or raise SkillValidationError.
-Retrievers return bounded active filtered candidates; rerankers return only their
-provided candidates without duplication. Sinks receive sanitized events.
+Discovery providers return at most `top_k` active Skills that match the filters, never
+invented or duplicated Skills, and release owned resources in `aclose`. RetrievalLoom
+embedding models must return vectors of their declared `dimensions`; rerankers score
+only the items they receive. Sinks receive sanitized events.
 
 Use explicit ownership and backend-specific chained exceptions. Database adapters
 must preserve atomicity and concurrent-write guarantees, not merely pass sequential tests.

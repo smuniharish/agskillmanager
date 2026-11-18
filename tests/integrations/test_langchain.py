@@ -5,16 +5,19 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
+from langchain_core.embeddings import DeterministicFakeEmbedding
 from langchain_core.runnables import RunnableLambda
+from retrievalloom import Components
 from xstructured import XStructuredError
 
 from skill_manager import (
+    RetrievalLoomDiscoveryProvider,
     Skill,
     SkillFeedback,
     SkillGenerationError,
     SkillGenerationRequest,
 )
-from skill_manager.integrations.langchain import XStructuredSkillGenerator
+from skill_manager.integrations.langchain import LangChainEmbeddingModel, XStructuredSkillGenerator
 from tests.helpers import make_skill
 
 DRAFT_FIELDS = {"metadata", "instructions", "dependencies", "capabilities", "resources", "prompts"}
@@ -22,6 +25,22 @@ DRAFT_FIELDS = {"metadata", "instructions", "dependencies", "capabilities", "res
 
 def draft_json(skill: Skill) -> str:
     return skill.model_dump_json(include=DRAFT_FIELDS)
+
+
+async def test_langchain_embedding_model_powers_semantic_discovery() -> None:
+    with pytest.raises(ValueError, match="dimensions"):
+        LangChainEmbeddingModel(DeterministicFakeEmbedding(size=8), dimensions=0)
+    model = LangChainEmbeddingModel(DeterministicFakeEmbedding(size=8), dimensions=8)
+    assert model.info.fingerprint.model_identity == "DeterministicFakeEmbedding"
+    provider = RetrievalLoomDiscoveryProvider(components=Components(embedding=model))
+    skills = [make_skill("alpha"), make_skill("beta")]
+    try:
+        await provider.index(skills)
+        matches = await provider.discover("zzqx", top_k=2)
+    finally:
+        await provider.aclose()
+    assert {skill.metadata.name for skill in matches} <= {"alpha", "beta"}
+    assert matches
 
 
 async def test_generation_and_revision_inputs() -> None:

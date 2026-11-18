@@ -1,13 +1,20 @@
-"""Composable retrieval and reranking for bounded Skill discovery."""
+"""Bounded Skill discovery backed by the RetrievalLoom hybrid retrieval engine."""
 
 from __future__ import annotations
 
 import asyncio
-import math
-import re
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
+
+from retrievalloom import (
+    And,
+    DocumentInput,
+    Eq,
+    RetrievalEngine,
+    Scope,
+    SourceDescriptor,
+    TextRepresentation,
+)
 
 from skill_manager.errors import SkillDiscoveryError
 from skill_manager.models import Skill, SkillLifecycleState
@@ -15,55 +22,14 @@ from skill_manager.models import Skill, SkillLifecycleState
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-    from mcp_capability_router import Embedder
+    from retrievalloom import Components, EngineConfig, FilterExpression, IngestReport
 
-_TOKEN_PATTERN = re.compile(r"[a-z0-9][a-z0-9_.]*", re.IGNORECASE)
 _FILTER_KEYS = frozenset({"name", "version", "tag", "capability"})
-
-
-@dataclass(frozen=True, slots=True)
-class RetrievedSkill:
-    """A retrieved Skill candidate and its backend-specific relevance score."""
-
-    skill: Skill
-    score: float
-
-
-class SkillRetriever(ABC):
-    """Extension point that indexes Skills and returns scored candidates.
-
-    `PipelineDiscoveryProvider` calls `index` whenever the catalog changes and
-    `retrieve` for each query. Return only ``ACTIVE`` Skills that satisfy
-    ``filters``; use `matches_filters` to apply them.
-    """
-
-    @abstractmethod
-    async def index(self, skills: Sequence[Skill]) -> None:
-        """Replace the retriever's catalog snapshot."""
-
-    @abstractmethod
-    async def retrieve(
-        self,
-        query: str,
-        *,
-        limit: int,
-        filters: Mapping[str, Any] | None = None,
-    ) -> list[RetrievedSkill]:
-        """Return at most ``limit`` active, filtered candidates."""
-
-
-class SkillReranker(ABC):
-    """Extension point that orders retrieved candidates into the final result."""
-
-    @abstractmethod
-    async def rerank(
-        self,
-        query: str,
-        candidates: Sequence[RetrievedSkill],
-        *,
-        top_k: int,
-    ) -> list[Skill]:
-        """Return at most ``top_k`` of ``candidates`` in final relevance order."""
+_FILTER_FIELDS = {"name": "name", "version": "version", "tag": "tags", "capability": "capabilities"}
+_FAILED_OUTCOMES = frozenset({"rejected", "failed"})
+_INGEST_BATCH_SIZE = 1000
+DEFAULT_SCOPE = Scope(tenant_id="agskillmanager", collection="skills")
+"""The RetrievalLoom scope that `RetrievalLoomDiscoveryProvider` uses by default."""
 
 
 class DiscoveryProvider(ABC):
@@ -86,6 +52,9 @@ class DiscoveryProvider(ABC):
         filters: Mapping[str, Any] | None = None,
     ) -> list[Skill]:
         """Return at most ``top_k`` active candidates."""
+
+    async def aclose(self) -> None:  # noqa: B027
+        """Release resources the provider owns; the default does nothing."""
 
 
 def validate_filters(filters: Mapping[str, Any] | None) -> None:
@@ -115,7 +84,7 @@ def matches_filters(skill: Skill, filters: Mapping[str, Any] | None) -> bool:
 
 
 def skill_document(skill: Skill) -> str:
-    """Return the text that retrievers index for ``skill``."""
+    """Return the text that is indexed for ``skill``."""
     return "\n".join(
         (
             skill.metadata.name,
@@ -127,181 +96,132 @@ def skill_document(skill: Skill) -> str:
     )
 
 
-def _active(skills: Sequence[Skill]) -> tuple[Skill, ...]:
-    return tuple(skill for skill in skills if skill.lifecycle.state is SkillLifecycleState.ACTIVE)
+def _document(skill: Skill) -> DocumentInput:
+    return DocumentInput(
+        id=skill.skill_id,
+        source=SourceDescriptor(uri=f"skill://{skill.skill_id}", title=skill.metadata.name),
+        metadata={
+            "name": skill.metadata.name,
+            "version": skill.metadata.version,
+            "tags": list(skill.metadata.tags),
+            "capabilities": [capability.name for capability in skill.capabilities],
+        },
+        representations=[TextRepresentation(text=skill_document(skill))],
+    )
 
 
-def _check_limit(limit: int) -> None:
-    if limit < 1:
-        raise SkillDiscoveryError("retrieval limit must be at least 1")
+def _filter_expression(filters: Mapping[str, Any] | None) -> FilterExpression | None:
+    if not filters:
+        return None
+    clauses = [Eq(field=_FILTER_FIELDS[key], value=value) for key, value in filters.items()]
+    return clauses[0] if len(clauses) == 1 else And(clauses=tuple(clauses))
 
 
-def _top(retrieved: list[RetrievedSkill], limit: int) -> list[RetrievedSkill]:
-    retrieved.sort(key=lambda item: (-item.score, item.skill.skill_id))
-    return retrieved[:limit]
+def _check_report(report: IngestReport) -> None:
+    failed = [item for item in report.documents if item.outcome.value in _FAILED_OUTCOMES]
+    if failed:
+        details = ", ".join(f"{item.document_id}: {item.outcome.value}" for item in failed)
+        raise SkillDiscoveryError(f"RetrievalLoom did not index every Skill ({details})")
 
 
-class LexicalSkillRetriever(SkillRetriever):
-    """Deterministic inverted-index retrieval over Skill text.
+class RetrievalLoomDiscoveryProvider(DiscoveryProvider):
+    """Discover Skills with a RetrievalLoom `RetrievalEngine`.
 
-    The score is the number of distinct query terms found in a Skill. An empty
-    query matches every active Skill with score zero.
-    """
+    Each active Skill is one RetrievalLoom document whose ID is the Skill ID and
+    whose text is `skill_document`. Its name, version, tags and capability names
+    are stored as metadata, so discovery filters run inside the engine. The
+    default engine runs in memory with keyword, fuzzy and BM25 search; pass
+    ``components`` (an embedding model, reranker, NLI model or durable stores) or
+    a configured ``engine`` for semantic search, reranking and persistence.
 
-    def __init__(self) -> None:
-        self._skills: tuple[Skill, ...] = ()
-        self._tokens: dict[str, frozenset[str]] = {}
-        self._postings: dict[str, frozenset[str]] = {}
-
-    async def index(self, skills: Sequence[Skill]) -> None:
-        """Tokenize every active Skill and rebuild the inverted index."""
-        active = _active(skills)
-        tokens = {
-            skill.skill_id: frozenset(_TOKEN_PATTERN.findall(skill_document(skill).lower()))
-            for skill in active
-        }
-        postings: dict[str, set[str]] = {}
-        for skill_id, skill_tokens in tokens.items():
-            for token in skill_tokens:
-                postings.setdefault(token, set()).add(skill_id)
-        self._skills = active
-        self._tokens = tokens
-        self._postings = {token: frozenset(ids) for token, ids in postings.items()}
-
-    async def retrieve(
-        self,
-        query: str,
-        *,
-        limit: int,
-        filters: Mapping[str, Any] | None = None,
-    ) -> list[RetrievedSkill]:
-        """Return the active Skills sharing the most terms with ``query``."""
-        _check_limit(limit)
-        validate_filters(filters)
-        terms = frozenset(_TOKEN_PATTERN.findall(query.lower()))
-        if terms:
-            ids = frozenset().union(*(self._postings.get(term, frozenset()) for term in terms))
-            candidates = [skill for skill in self._skills if skill.skill_id in ids]
-        else:
-            candidates = list(self._skills)
-        return _top(
-            [
-                RetrievedSkill(skill, float(len(terms & self._tokens[skill.skill_id])))
-                for skill in candidates
-                if matches_filters(skill, filters)
-            ],
-            limit,
-        )
-
-
-def _unit(vector: Sequence[float]) -> tuple[float, ...]:
-    norm = math.sqrt(math.fsum(value * value for value in vector))
-    return tuple(value / norm for value in vector) if norm else tuple(0.0 for _ in vector)
-
-
-class SemanticSkillRetriever(SkillRetriever):
-    """Dense cosine-similarity retrieval backed by an injected `Embedder`.
-
-    Any `mcp_capability_router.Embedder` works. With the ``langchain`` extra,
-    `skill_manager.integrations.langchain.LangChainEmbedder` adapts every
-    LangChain ``Embeddings``.
-    """
-
-    def __init__(self, embedder: Embedder) -> None:
-        self._embedder = embedder
-        self._entries: tuple[tuple[Skill, tuple[float, ...]], ...] = ()
-        self._index_lock = asyncio.Lock()
-
-    async def index(self, skills: Sequence[Skill]) -> None:
-        """Embed every active Skill and store unit-length vectors."""
-        active = _active(skills)
-        try:
-            vectors = await self._embedder.embed_documents([skill_document(s) for s in active])
-        except Exception as error:
-            raise SkillDiscoveryError("semantic Skill index embedding failed") from error
-        if len(vectors) != len(active):
-            raise SkillDiscoveryError("embedder returned a different number of vectors")
-        async with self._index_lock:
-            self._entries = tuple(
-                (skill, _unit(vector)) for skill, vector in zip(active, vectors, strict=True)
-            )
-
-    async def retrieve(
-        self,
-        query: str,
-        *,
-        limit: int,
-        filters: Mapping[str, Any] | None = None,
-    ) -> list[RetrievedSkill]:
-        """Return the active Skills closest to ``query`` by cosine similarity."""
-        _check_limit(limit)
-        validate_filters(filters)
-        async with self._index_lock:
-            entries = self._entries
-        try:
-            query_vector = _unit(await self._embedder.embed_query(query))
-        except Exception as error:
-            raise SkillDiscoveryError("semantic Skill query embedding failed") from error
-        try:
-            return _top(
-                [
-                    RetrievedSkill(
-                        skill,
-                        math.fsum(a * b for a, b in zip(query_vector, vector, strict=True)),
-                    )
-                    for skill, vector in entries
-                    if matches_filters(skill, filters)
-                ],
-                limit,
-            )
-        except ValueError as error:
-            raise SkillDiscoveryError("query and index vectors differ in dimension") from error
-
-
-class ScoreSkillReranker(SkillReranker):
-    """Order candidates by retrieval score, breaking ties by Skill ID."""
-
-    async def rerank(
-        self,
-        query: str,
-        candidates: Sequence[RetrievedSkill],
-        *,
-        top_k: int,
-    ) -> list[Skill]:
-        """Return the ``top_k`` highest-scoring Skills."""
-        del query
-        return [item.skill for item in _top(list(candidates), top_k)]
-
-
-class PipelineDiscoveryProvider(DiscoveryProvider):
-    """Compose a retriever and a reranker into bounded, verified discovery.
-
-    The provider asks the retriever for ``max(top_k, candidate_pool_size)``
-    candidates, reranks them, and checks that neither stage exceeded its limit,
-    invented a Skill, or returned an inactive or filtered-out Skill.
+    Every result is checked against the indexed catalog, so the provider never
+    returns an inactive, filtered-out or unknown Skill. An empty query returns
+    the active, filtered Skills ordered by Skill ID.
 
     Args:
-        retriever: Candidate source; defaults to `LexicalSkillRetriever`.
-        reranker: Final ordering; defaults to `ScoreSkillReranker`.
-        candidate_pool_size: Minimum number of candidates to rerank.
+        engine: A RetrievalLoom engine; the provider initializes it but leaves
+            closing it to the caller. Mutually exclusive with ``config`` and
+            ``components``.
+        config: Configuration for an engine the provider creates and closes.
+        components: Components for an engine the provider creates and closes.
+        scope: The tenant and collection that hold the Skill documents.
+        candidate_pool_size: Minimum number of results requested from the
+            engine before the provider trims them to ``top_k``.
+
+    Raises:
+        ValueError: If ``engine`` is combined with ``config`` or ``components``,
+            or ``candidate_pool_size`` is below 1.
     """
 
     def __init__(
         self,
-        retriever: SkillRetriever | None = None,
+        engine: RetrievalEngine | None = None,
         *,
-        reranker: SkillReranker | None = None,
+        config: EngineConfig | None = None,
+        components: Components | None = None,
+        scope: Scope = DEFAULT_SCOPE,
         candidate_pool_size: int = 50,
     ) -> None:
+        if engine is not None and (config is not None or components is not None):
+            raise ValueError("pass either engine or config/components, not both")
         if candidate_pool_size < 1:
             raise ValueError("candidate_pool_size must be at least 1")
-        self._retriever = retriever if retriever is not None else LexicalSkillRetriever()
-        self._reranker = reranker if reranker is not None else ScoreSkillReranker()
+        self._owns_engine = engine is None
+        self._engine = (
+            engine if engine is not None else RetrievalEngine(config=config, components=components)
+        )
+        self._scope = scope
         self._candidate_pool_size = candidate_pool_size
+        self._skills: dict[str, Skill] = {}
+        self._lock = asyncio.Lock()
+        self._initialized = False
+
+    @property
+    def engine(self) -> RetrievalEngine:
+        """Return the underlying RetrievalLoom engine."""
+        return self._engine
+
+    @property
+    def scope(self) -> Scope:
+        """Return the RetrievalLoom scope that holds the Skill documents."""
+        return self._scope
+
+    async def _ready(self) -> None:
+        if not self._initialized:
+            try:
+                await self._engine.initialize()
+            except Exception as error:
+                raise SkillDiscoveryError("RetrievalLoom engine failed to initialize") from error
+            self._initialized = True
 
     async def index(self, skills: Sequence[Skill]) -> None:
-        """Forward the catalog snapshot to the retriever."""
-        await self._retriever.index(skills)
+        """Ingest new and changed active Skills and delete Skills no longer active."""
+        active = {
+            skill.skill_id: skill
+            for skill in skills
+            if skill.lifecycle.state is SkillLifecycleState.ACTIVE
+        }
+        async with self._lock:
+            await self._ready()
+            changed = [
+                _document(skill)
+                for skill_id, skill in active.items()
+                if self._skills.get(skill_id) != skill
+            ]
+            removed = sorted(set(self._skills) - set(active))
+            try:
+                for start in range(0, len(changed), _INGEST_BATCH_SIZE):
+                    batch = changed[start : start + _INGEST_BATCH_SIZE]
+                    _check_report(await self._engine.ingest(batch, scope=self._scope))
+                if removed:
+                    await self._engine.delete(removed, scope=self._scope)
+            except SkillDiscoveryError:
+                raise
+            except Exception as error:
+                raise SkillDiscoveryError(
+                    "RetrievalLoom could not index the Skill catalog"
+                ) from error
+            self._skills = active
 
     async def discover(
         self,
@@ -310,35 +230,45 @@ class PipelineDiscoveryProvider(DiscoveryProvider):
         top_k: int = 5,
         filters: Mapping[str, Any] | None = None,
     ) -> list[Skill]:
-        """Retrieve, rerank and verify at most ``top_k`` Skills."""
+        """Return at most ``top_k`` active Skills in RetrievalLoom relevance order."""
         if top_k < 1:
             raise SkillDiscoveryError("top_k must be at least 1")
         validate_filters(filters)
-        limit = max(top_k, self._candidate_pool_size)
-        candidates = await self._retriever.retrieve(query, limit=limit, filters=filters)
-        if len(candidates) > limit:
-            raise SkillDiscoveryError("Skill retriever returned more than its candidate limit")
-        allowed = tuple(item for item in candidates if matches_filters(item.skill, filters))
-        ranked = await self._reranker.rerank(query, allowed, top_k=top_k)
-        if len(ranked) > top_k:
-            raise SkillDiscoveryError("Skill reranker returned more than top_k candidates")
-        by_id = {item.skill.skill_id: item.skill for item in allowed}
-        if len({skill.skill_id for skill in ranked}) != len(ranked) or any(
-            by_id.get(skill.skill_id) != skill for skill in ranked
-        ):
-            raise SkillDiscoveryError("Skill reranker returned an invalid candidate set")
-        return ranked
+        skills = self._skills
+        if not query.strip():
+            matches = sorted(
+                (skill for skill in skills.values() if matches_filters(skill, filters)),
+                key=lambda skill: skill.skill_id,
+            )
+            return matches[:top_k]
+        await self._ready()
+        try:
+            result = await self._engine.retrieve(
+                query,
+                scope=self._scope,
+                filters=_filter_expression(filters),
+                top_k=max(top_k, self._candidate_pool_size),
+            )
+        except Exception as error:
+            raise SkillDiscoveryError("RetrievalLoom Skill retrieval failed") from error
+        ranked: dict[str, Skill] = {}
+        for evidence in result.evidence:
+            for source in evidence.sources:
+                skill = skills.get(source.document_id)
+                if skill is not None and matches_filters(skill, filters):
+                    ranked.setdefault(skill.skill_id, skill)
+        return list(ranked.values())[:top_k]
+
+    async def aclose(self) -> None:
+        """Close the engine if the provider created it."""
+        if self._owns_engine:
+            await self._engine.close()
 
 
 __all__ = [
+    "DEFAULT_SCOPE",
     "DiscoveryProvider",
-    "LexicalSkillRetriever",
-    "PipelineDiscoveryProvider",
-    "RetrievedSkill",
-    "ScoreSkillReranker",
-    "SemanticSkillRetriever",
-    "SkillReranker",
-    "SkillRetriever",
+    "RetrievalLoomDiscoveryProvider",
     "matches_filters",
     "skill_document",
     "validate_filters",

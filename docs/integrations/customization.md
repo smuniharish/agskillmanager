@@ -12,8 +12,9 @@ Injected collaborators remain caller-owned.
 | mcp-capability-router | `mcp_runtime=MCPRuntime(...)` | Registry/retriever, concurrency, resilience, interceptors, metrics, state-store factory; transport/auth/client options through server registration |
 | refresh-engine | `refresh_engine=RefreshEngine(...)` | Resource source, operation, fingerprint, store, config and events |
 | agxai | `xai_runtime=XAIRuntime(...)` | Config, registry of storage/observability/explanation/attribution/policy collaborators, plugins, state capture and tenant/application/graph identity |
+| retrievalloom | `discovery=RetrievalLoomDiscoveryProvider(engine=... or components=..., config=..., scope=...)` | Embedding model, reranker, NLI, tokenizer, keyword/fuzzy/sparse indexes, vector and metadata stores, fusion, cache, access policy, provenance recorder; engine, retrieval and ingestion config |
 | xstructured (`langchain`) | `XStructuredSkillGenerator(runnable, repair=..., **options)` | Runnable, repair, parser/repair configs, renderers, extractors, recovery, decoder and observer options accepted by xstructured |
-| LangChain Core (`langchain`) | `LangChainEmbedder(embeddings)`; generator runnable | Any embeddings/runnable implementation and its provider-specific configuration |
+| LangChain Core (`langchain`) | `LangChainEmbeddingModel(embeddings, dimensions=...)`; generator runnable | Any embeddings/runnable implementation and its provider-specific configuration |
 | psycopg (`postgres`) | PostgreSQL source/registry with prebuilt pool | Connection/auth/TLS, sizing, timeouts, table/source identity, pool ownership |
 | OpenTelemetry (`otel`) | Sink with tracer/meter or providers | Sampling, processors/readers/exporters/resources, instrumentation name, ownership |
 
@@ -23,8 +24,8 @@ version constraints, not application runtimes needing a second store/policy faca
 ## Package-owned seams
 
 Async ABCs: `SkillSource`, `SkillRegistry`, `SkillValidator`, `SkillGenerator`,
-`DiscoveryProvider`, `SkillRetriever`, `SkillReranker`, `SkillObservabilitySink`.
-Semantic retrieval reuses the downstream `Embedder` ABC.
+`DiscoveryProvider`, `SkillObservabilitySink`. Semantic search, reranking and NLI
+reuse RetrievalLoom's `EmbeddingModelABC`, `RerankerABC` and `NLIABC`.
 
 ```python
 from feedback_manager import FeedbackManager

@@ -9,7 +9,7 @@
     {
       "id": 2,
       "prompt": "Add semantic retrieval with our embedding client.",
-      "expected_output": "Downstream Embedder ABC with matching vector dimensions; no framework dependency in core."
+      "expected_output": "RetrievalLoom EmbeddingModelABC with declared dimensions passed via Components to RetrievalLoomDiscoveryProvider; no framework dependency in core."
     }
   ]
 }
