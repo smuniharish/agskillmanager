@@ -44,8 +44,8 @@ classifiers = [
 ]
 dependencies = [
   "agxai>=1.0.3,<2",
-  "feedback-manager>=0.1.2,<0.2",
-  "mcp-capability-router>=1.0.2,<2",
+  "feedback-manager>=0.1.2,<0.3",
+  "mcp-capability-router>=1.0.2,<3",
   "packaging>=26.3",
   "pydantic>=2.14.3,<3",
   "pyyaml>=6.0.3,<7",
